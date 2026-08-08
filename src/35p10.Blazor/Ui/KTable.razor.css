@@ -1,0 +1,39 @@
+.table-wrap {
+    overflow: auto;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+::deep .table th,
+::deep .table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #edf2f7;
+    text-align: left;
+}
+
+::deep .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--win98-surface, #f4f4f4);
+    color: #000;
+}
+
+::deep .table-row-clickable {
+    cursor: pointer;
+}
+
+::deep .table-row-clickable:hover {
+    background: #e3e3e3;
+}
+
+::deep .table-row-active {
+    background: rgba(27, 161, 226, 0.1);
+}

@@ -1,0 +1,33 @@
+@namespace k35p10.Blazor
+
+@if (IsOpen)
+{
+    <div class="dialog-backdrop" @onclick="HandleBackdropClick">
+        <div class="dialog-window" @onclick:stopPropagation="true">
+            <div class="dialog-head">
+                <KText Variant="KTextVariant.Subtitle" Tag="h3">@Title</KText>
+                <KButton Class="subtle" OnClick="CloseAsync">Close</KButton>
+            </div>
+            <div class="dialog-body">
+                @ChildContent
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public EventCallback<bool> IsOpenChanged { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private Task HandleBackdropClick() => CloseAsync();
+
+    private async Task CloseAsync()
+    {
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+        await OnClose.InvokeAsync();
+    }
+}

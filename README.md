@@ -89,6 +89,48 @@ All four share the same `field-input` look (padding, border, radius, background,
 
 Deliberately NOT built yet: a checkbox or range-slider component. The existing checkboxes/sliders in the app are too few and too varied in surrounding layout to generalize well — extracting them now would mean designing without enough real usage to learn from.
 
+## Badges
+
+```razor
+<KBadge>Idle</KBadge>
+<KBadge Color="KColor.Success">Connected</KBadge>
+<KBadge Color="KColor.Danger" Rounded="false">Failed</KBadge>
+<KBadge Color="KColor.Success" Dot="true">Live</KBadge>
+```
+
+`KBadge` unifies the ~8 near-duplicate "status pill"/"badge" classes found across the app (`connection-pill`, `stream-pill`, `status-pill`, `seg-badge`, `trial-type-badge`, `metric-pill`, ...), which had drifted into several *different* shades of green/red/amber for the same semantic state. Reuses `KColor` (`Muted` default, `Primary`, `Danger`, `Success`, `Warning`) so every status pill in the app now shares exactly one green, one red, one amber. `Rounded` (default `true`) toggles between the fully-rounded "pill" shape and the more rectangular "badge" shape (`border-radius: 6px`) — both shapes existed in the app and neither is more "correct." `Dot="true"` adds a small leading `currentColor` dot (the one real precedent: `GazeLive`'s "Live" indicator).
+
+Deliberately left OUT of this unification: `SessionControl`'s `.active-badge` and `View360`'s `.v360-resolution-badge` — both are absolutely-positioned overlay labels on top of an image thumbnail, a different concern (image annotation, not status communication) from every other badge found.
+
+## Spinner, dialog, table
+
+```razor
+<KSpinner />
+
+<KDialog @bind-IsOpen="ShowDialog" Title="@($"{Trial.Id} · {Image.Id}")">
+    <p>Dialog body content.</p>
+</KDialog>
+
+<KTable MaxHeight="600px">
+    <thead>
+        <tr><th>Name</th><th>Value</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Rows)
+        {
+            <tr class="@(row.IsCurrent ? "table-row-active" : "table-row-clickable")" @onclick="() => Select(row)">
+                <td>@row.Name</td>
+                <td>@row.Value</td>
+            </tr>
+        }
+    </tbody>
+</KTable>
+```
+
+- `KSpinner` — a single `<span class="spinner">`, the rotating-border loading indicator already duplicated (with two different `@keyframes` names) in `SessionControl.razor`/`Player.razor`. Compose it with your own text/`KCard` wrapper as needed — it doesn't bundle a label, matching how narrowly-scoped `KButton`/`KCard` are.
+- `KDialog` — a backdrop + centered window modal (click backdrop or the built-in "Close" button to dismiss; clicks inside the window don't propagate to the backdrop). `@bind-IsOpen` controls visibility; `OnClose` fires for any side effects beyond closing. Only one dialog existed in the app before this (`Player.razor`'s image-source picker) — the API is intentionally minimal (`Title` + `ChildContent`) since there wasn't more real usage to design against yet.
+- `KTable` — a thin wrapper around a native `<table>`: you still write `<thead>`/`<tbody>`/`<tr>`/`<th>`/`<td>` yourself (tables have too much semantic structure to hide behind a component API), `KTable` just supplies the shared container look (scroll wrapper, border, sticky header, row font-size/padding) that was previously copy-pasted per page. Two opt-in row modifier classes — `table-row-clickable` (hover + pointer cursor) and `table-row-active` (current-row highlight) — cover the interaction patterns already found in the app (`Player.razor`'s sample rows, `ExperimentResultsView`'s comparison rows).
+
 ## Theming
 
 The full color palette (the "win98" design system) lives in `wwwroot/theme.css` as `:root` custom properties. Link it once from the host app's `index.html`/`_Host`/`App.razor`, before any page-specific stylesheet:
