@@ -7,20 +7,20 @@ Reusable Blazor components: blog-style article pages (header, sections, a scroll
 ```razor
 @using k35p10.Blazor
 
-<BlogArticle InitialSectionId="overview">
+<KBlogArticle InitialSectionId="overview">
     <Header>
-        <BlogHeader Title="My Article" Meta="2026-08-08" Lead="A short summary." />
+        <KBlogHeader Title="My Article" Meta="2026-08-08" Lead="A short summary." />
     </Header>
     <ChildContent>
-        <BlogSection Id="overview" Title="Overview">
+        <KBlogSection Id="overview" Title="Overview">
             <p>Content goes here.</p>
-            <BlogCode Code="dotnet pack" />
-        </BlogSection>
+            <KBlogCode Code="dotnet pack" />
+        </KBlogSection>
     </ChildContent>
-</BlogArticle>
+</KBlogArticle>
 ```
 
-`BlogArticle` builds the table of contents automatically from the `BlogSection` children it renders, and handles smooth-scrolling to a section when a TOC entry is clicked.
+`KBlogArticle` builds the table of contents automatically from the `KBlogSection` children it renders, and handles smooth-scrolling to a section when a TOC entry is clicked. Component names are prefixed with `K` to avoid tag-name collisions with other component libraries; the underlying CSS classes (`blog-header`, `blog-section`, ...) are unprefixed.
 
 ## UI usage
 
@@ -40,7 +40,7 @@ Reusable Blazor components: blog-style article pages (header, sections, a scroll
 <KButton Href="/back">Back</KButton>
 ```
 
-`KCard` renders a `<div>` (or an `<a>` when `Href` is set) with class `card`. `KButton` renders a `<button>` (or an `<a>` when `Href` is set) with class `action-button`, plus `primary`/`danger`/`icon-only` modifiers driven by the `Variant`/`IconOnly` parameters. Component names are prefixed with `K` to avoid tag-name collisions with other component libraries; the underlying CSS classes (`card`, `action-button`, ...) are unprefixed.
+`KCard` renders a `<div>` (or an `<a>` when `Href` is set) with class `card`. `KButton` renders a `<button>` (or an `<a>` when `Href` is set) with class `action-button`, plus `primary`/`danger`/`icon-only` modifiers driven by the `Variant`/`IconOnly` parameters.
 
 ## Theming
 

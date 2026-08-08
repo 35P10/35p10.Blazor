@@ -2,63 +2,63 @@
 
 <PageTitle>35p10.Blazor Demo</PageTitle>
 
-<BlogArticle InitialSectionId="overview">
+<KBlogArticle InitialSectionId="overview">
     <Header>
-        <BlogHeader Title="35p10.Blazor" Meta="2026-08-08" Lead="Reusable Blazor components for blog-style article pages, shown here in action." />
+        <KBlogHeader Title="35p10.Blazor" Meta="2026-08-08" Lead="Reusable Blazor components for blog-style article pages, shown here in action." />
     </Header>
     <ChildContent>
-        <BlogSection Id="overview" Title="Overview">
+        <KBlogSection Id="overview" Title="Overview">
             <p>
-                <code>BlogArticle</code> builds the table of contents automatically from the
-                <code>BlogSection</code> children it renders, and handles smooth-scrolling to a
+                <code>KBlogArticle</code> builds the table of contents automatically from the
+                <code>KBlogSection</code> children it renders, and handles smooth-scrolling to a
                 section when a TOC entry is clicked.
             </p>
-        </BlogSection>
+        </KBlogSection>
 
-        <BlogSection Id="usage" Title="Usage">
+        <KBlogSection Id="usage" Title="Usage">
             <p>Reference the package and compose an article from sections:</p>
-            <BlogCode Code="@UsageSnippet" />
-        </BlogSection>
+            <KBlogCode Code="@UsageSnippet" />
+        </KBlogSection>
 
-        <BlogSection Id="components" Title="Components">
+        <KBlogSection Id="components" Title="Components">
             <p>The package ships with:</p>
-            <BlogList Items="@ComponentNames" />
-        </BlogSection>
+            <KBlogList Items="@ComponentNames" />
+        </KBlogSection>
 
-        <BlogSection Id="theming" Title="Theming">
+        <KBlogSection Id="theming" Title="Theming">
             <p>
                 Styles fall back to sensible defaults but pick up <code>--win98-blue</code>,
                 <code>--win98-blue-strong</code>, and <code>--ui-border</code> if the host app
                 defines them.
             </p>
-        </BlogSection>
+        </KBlogSection>
     </ChildContent>
-</BlogArticle>
+</KBlogArticle>
 
 @code {
     private const string UsageSnippet =
         """
         @using k35p10.Blazor
 
-        <BlogArticle InitialSectionId="overview">
+        <KBlogArticle InitialSectionId="overview">
             <Header>
-                <BlogHeader Title="My Article" Meta="2026-08-08" Lead="A short summary." />
+                <KBlogHeader Title="My Article" Meta="2026-08-08" Lead="A short summary." />
             </Header>
             <ChildContent>
-                <BlogSection Id="overview" Title="Overview">
+                <KBlogSection Id="overview" Title="Overview">
                     <p>Content goes here.</p>
-                </BlogSection>
+                </KBlogSection>
             </ChildContent>
-        </BlogArticle>
+        </KBlogArticle>
         """;
 
     private static readonly string[] ComponentNames =
     [
-        "BlogArticle - layout shell + table-of-contents context",
-        "BlogHeader - title, meta, and lead paragraph",
-        "BlogSection - a titled, anchorable section",
-        "BlogToc - scroll-spy table of contents",
-        "BlogCode - preformatted code block",
-        "BlogList - simple bulleted list",
+        "KBlogArticle - layout shell + table-of-contents context",
+        "KBlogHeader - title, meta, and lead paragraph",
+        "KBlogSection - a titled, anchorable section",
+        "KBlogToc - scroll-spy table of contents",
+        "KBlogCode - preformatted code block",
+        "KBlogList - simple bulleted list",
     ];
 }
