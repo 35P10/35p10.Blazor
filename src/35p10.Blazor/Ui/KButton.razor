@@ -1,0 +1,55 @@
+@namespace k35p10.Blazor
+
+@if (Href is not null)
+{
+    <a href="@Href" class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+    </a>
+}
+else
+{
+    <button type="@Type" class="@CssClass" disabled="@Disabled" @onclick="OnClick" @attributes="AdditionalAttributes">
+        @ChildContent
+    </button>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string Type { get; set; } = "button";
+    [Parameter] public KButtonVariant Variant { get; set; } = KButtonVariant.Default;
+    [Parameter] public bool IconOnly { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass
+    {
+        get
+        {
+            var classes = new List<string> { "action-button" };
+
+            if (Variant == KButtonVariant.Primary)
+            {
+                classes.Add("primary");
+            }
+            else if (Variant == KButtonVariant.Danger)
+            {
+                classes.Add("danger");
+            }
+
+            if (IconOnly)
+            {
+                classes.Add("icon-only");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Class))
+            {
+                classes.Add(Class);
+            }
+
+            return string.Join(' ', classes);
+        }
+    }
+}

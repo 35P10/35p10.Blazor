@@ -1,0 +1,42 @@
+@namespace k35p10.Blazor
+@using Microsoft.AspNetCore.Components.Rendering
+
+@if (Href is not null)
+{
+    <a href="@Href" class="@CssClass" @attributes="AdditionalAttributes">
+        @RenderHeader()
+        @ChildContent
+    </a>
+}
+else
+{
+    <div class="@CssClass" @attributes="AdditionalAttributes">
+        @RenderHeader()
+        @ChildContent
+    </div>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public string? HeaderClass { get; set; }
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "card" : $"card {Class}";
+
+    private RenderFragment RenderHeader() => builder =>
+    {
+        if (HeaderContent is null)
+        {
+            return;
+        }
+
+        var headerClass = string.IsNullOrWhiteSpace(HeaderClass) ? "card-header" : $"card-header {HeaderClass}";
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", headerClass);
+        builder.AddContent(2, HeaderContent);
+        builder.CloseElement();
+    };
+}
