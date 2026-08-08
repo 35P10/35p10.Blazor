@@ -1,0 +1,41 @@
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<CascadingValue Value="_context">
+    <div class="blog-shell">
+        <BlogToc />
+
+        <article class="blog-body">
+            <div class="blog-article">
+                @if (Header is not null)
+                {
+                    @Header
+                }
+
+                @ChildContent
+            </div>
+        </article>
+    </div>
+</CascadingValue>
+
+@code {
+    [Parameter] public string InitialSectionId { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private BlogArticleContext _context = default!;
+
+    protected override void OnInitialized()
+    {
+        _context = new BlogArticleContext(JS, InitialSectionId);
+        _context.Changed += HandleContextChanged;
+    }
+
+    private void HandleContextChanged() => InvokeAsync(StateHasChanged);
+
+    public async ValueTask DisposeAsync()
+    {
+        _context.Changed -= HandleContextChanged;
+        await _context.DisposeAsync();
+    }
+}

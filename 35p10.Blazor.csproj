@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>k35p10.Blazor</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>35p10.Blazor</PackageId>
+        <Version>1.0.0</Version>
+        <Description>Reusable Blazor components for blog-style article pages: header, sections, table of contents with scroll spy, and code blocks.</Description>
+        <PackageTags>blazor;blog;razor-components</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+</Project>

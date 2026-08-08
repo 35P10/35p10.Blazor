@@ -1,0 +1,18 @@
+.blog-code {
+    margin: 0 0 1rem;
+    padding: 0.85rem 1rem;
+    overflow-x: auto;
+    border-left: 3px solid var(--win98-blue, #1BA1E2);
+    border-radius: 0 8px 8px 0;
+    background: rgba(255, 255, 255, 0.7);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.blog-code code {
+    color: inherit;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+}

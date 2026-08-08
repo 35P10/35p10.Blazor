@@ -1,0 +1,22 @@
+<header class="blog-header">
+    @if (Meta is not null)
+    {
+        <p class="blog-meta">@Meta</p>
+    }
+    <h1>@Title</h1>
+    @if (Lead is not null)
+    {
+        <p class="blog-lead">@Lead</p>
+    }
+</header>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Meta { get; set; }
+
+    [Parameter]
+    public string? Lead { get; set; }
+}

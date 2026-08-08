@@ -1,0 +1,80 @@
+.blog-toc {
+    min-height: 0;
+    height: 100%;
+    overflow: auto;
+    padding: 0.5rem 0;
+}
+
+.blog-toc-label {
+    margin: 0 0 0.75rem;
+    color: #777;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.blog-toc-nav {
+    display: grid;
+    gap: 0.1rem;
+}
+
+.blog-toc-link {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: 0.35rem;
+    align-items: baseline;
+    width: 100%;
+    margin: 0;
+    padding: 0.35rem 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: #555;
+    font: inherit;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    text-align: left;
+    cursor: pointer;
+}
+
+.blog-toc-num {
+    color: #999;
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.blog-toc-link:hover {
+    color: var(--win98-blue-strong, #1277a7);
+}
+
+.blog-toc-link.is-active {
+    color: #111;
+    font-weight: 600;
+}
+
+.blog-toc-link.is-active .blog-toc-num {
+    color: var(--win98-blue-strong, #1277a7);
+}
+
+@media (max-width: 900px) {
+    .blog-toc {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        padding-bottom: 0.25rem;
+        border-bottom: 1px solid var(--ui-border, #c6c6c6);
+    }
+
+    .blog-toc-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+    }
+
+    .blog-toc-link {
+        width: auto;
+        grid-template-columns: auto auto;
+        padding: 0.2rem 0;
+    }
+}

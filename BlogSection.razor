@@ -1,0 +1,22 @@
+<section id="@Id" class="blog-section">
+    <h2>@Title</h2>
+    <div class="blog-section-body">
+        @ChildContent
+    </div>
+</section>
+
+@code {
+    [CascadingParameter]
+    public BlogArticleContext Context { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized() => Context.RegisterSection(Id, Title);
+}
