@@ -1,0 +1,52 @@
+@namespace k35p10.Blazor
+
+@switch (ResolvedTag)
+{
+    case "h1":
+        <h1 class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</h1>
+        break;
+    case "h2":
+        <h2 class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</h2>
+        break;
+    case "h3":
+        <h3 class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</h3>
+        break;
+    case "span":
+        <span class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</span>
+        break;
+    default:
+        <p class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</p>
+        break;
+}
+
+@code {
+    [Parameter] public KTextVariant Variant { get; set; } = KTextVariant.Body;
+    [Parameter] public KColor? Color { get; set; }
+    [Parameter] public string? Tag { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string ResolvedTag => Tag ?? DefaultTag;
+
+    private string DefaultTag => Variant switch
+    {
+        KTextVariant.Title => "h1",
+        KTextVariant.Subtitle => "h2",
+        _ => "p",
+    };
+
+    private string VariantClass => Variant switch
+    {
+        KTextVariant.Title => "title",
+        KTextVariant.Subtitle => "subtitle",
+        KTextVariant.Lead => "lead",
+        KTextVariant.Caption => "caption",
+        KTextVariant.Muted => "muted",
+        _ => "body",
+    };
+
+    private string? ColorStyle => Color is { } color ? $"color: {color.ToVar()};" : null;
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? $"text {VariantClass}" : $"text {VariantClass} {Class}";
+}

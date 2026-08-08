@@ -9,7 +9,10 @@
     --win98-blue: #1BA1E2;
     --win98-blue-strong: #1277a7;
     --win98-text: #181818;
+    --win98-muted: #555555;
     --win98-danger: #8f3a3a;
+    --win98-success: #176b36;
+    --win98-warning: #765600;
     --ui-border: #c6c6c6;
     --ui-border-strong: #a9a9a9;
 }

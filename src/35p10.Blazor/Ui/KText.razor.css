@@ -1,0 +1,42 @@
+.text {
+    margin: 0;
+}
+
+.text.title {
+    color: var(--win98-text, #181818);
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.text.subtitle {
+    color: var(--win98-text, #181818);
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.text.body {
+    color: var(--win98-text, #181818);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.text.lead {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.text.caption {
+    color: #777;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.text.muted {
+    color: var(--win98-muted, #555555);
+    font-size: 0.82rem;
+}
