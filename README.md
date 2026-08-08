@@ -11,11 +11,12 @@ Reusable Blazor components for blog-style article pages: header, sections, a scr
     <Header>
         <BlogHeader Title="My Article" Meta="2026-08-08" Lead="A short summary." />
     </Header>
-
-    <BlogSection Id="overview" Title="Overview">
-        <p>Content goes here.</p>
-        <BlogCode Code="dotnet pack" />
-    </BlogSection>
+    <ChildContent>
+        <BlogSection Id="overview" Title="Overview">
+            <p>Content goes here.</p>
+            <BlogCode Code="dotnet pack" />
+        </BlogSection>
+    </ChildContent>
 </BlogArticle>
 ```
 

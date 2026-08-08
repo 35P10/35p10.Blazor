@@ -4,7 +4,7 @@ namespace k35p10.Blazor;
 
 public sealed class BlogArticleContext : IAsyncDisposable
 {
-    private const string ModulePath = "./_content/35p10.Blazor/blog.js";
+    private const string ModulePath = "./_content/35p10.Blazor/blog/blog.js";
 
     private readonly IJSRuntime _js;
     private readonly List<BlogSectionInfo> _sections = [];

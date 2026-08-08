@@ -1,0 +1,64 @@
+@page "/"
+
+<PageTitle>35p10.Blazor Demo</PageTitle>
+
+<BlogArticle InitialSectionId="overview">
+    <Header>
+        <BlogHeader Title="35p10.Blazor" Meta="2026-08-08" Lead="Reusable Blazor components for blog-style article pages, shown here in action." />
+    </Header>
+    <ChildContent>
+        <BlogSection Id="overview" Title="Overview">
+            <p>
+                <code>BlogArticle</code> builds the table of contents automatically from the
+                <code>BlogSection</code> children it renders, and handles smooth-scrolling to a
+                section when a TOC entry is clicked.
+            </p>
+        </BlogSection>
+
+        <BlogSection Id="usage" Title="Usage">
+            <p>Reference the package and compose an article from sections:</p>
+            <BlogCode Code="@UsageSnippet" />
+        </BlogSection>
+
+        <BlogSection Id="components" Title="Components">
+            <p>The package ships with:</p>
+            <BlogList Items="@ComponentNames" />
+        </BlogSection>
+
+        <BlogSection Id="theming" Title="Theming">
+            <p>
+                Styles fall back to sensible defaults but pick up <code>--win98-blue</code>,
+                <code>--win98-blue-strong</code>, and <code>--ui-border</code> if the host app
+                defines them.
+            </p>
+        </BlogSection>
+    </ChildContent>
+</BlogArticle>
+
+@code {
+    private const string UsageSnippet =
+        """
+        @using k35p10.Blazor
+
+        <BlogArticle InitialSectionId="overview">
+            <Header>
+                <BlogHeader Title="My Article" Meta="2026-08-08" Lead="A short summary." />
+            </Header>
+            <ChildContent>
+                <BlogSection Id="overview" Title="Overview">
+                    <p>Content goes here.</p>
+                </BlogSection>
+            </ChildContent>
+        </BlogArticle>
+        """;
+
+    private static readonly string[] ComponentNames =
+    [
+        "BlogArticle - layout shell + table-of-contents context",
+        "BlogHeader - title, meta, and lead paragraph",
+        "BlogSection - a titled, anchorable section",
+        "BlogToc - scroll-spy table of contents",
+        "BlogCode - preformatted code block",
+        "BlogList - simple bulleted list",
+    ];
+}
