@@ -44,10 +44,19 @@ Reusable Blazor components: blog-style article pages (header, sections, a scroll
 
 ## Theming
 
-Styles fall back to sensible defaults but pick up these CSS custom properties if the host app defines them:
+The full color palette (the "win98" design system) lives in `wwwroot/theme.css` as `:root` custom properties. Link it once from the host app's `index.html`/`_Host`/`App.razor`, before any page-specific stylesheet:
 
-- `--win98-blue`
-- `--win98-blue-strong`
-- `--ui-border`
-- `--win98-surface`
-- `--win98-surface-soft`
+```html
+<link rel="stylesheet" href="_content/35p10.Blazor/theme.css" />
+```
+
+That defines:
+
+- `--win98-bg`, `--win98-surface`, `--win98-surface-soft`
+- `--win98-shadow-dark`, `--win98-shadow-mid`
+- `--win98-highlight`, `--win98-highlight-soft`
+- `--win98-blue`, `--win98-blue-strong`
+- `--win98-text`, `--win98-danger`
+- `--ui-border`, `--ui-border-strong`
+
+Components also carry inline fallback values (e.g. `var(--win98-blue, #1ba1e2)`), so they render correctly even without linking `theme.css` — linking it just lets every consuming app share the exact same palette instead of each one hardcoding fallbacks.

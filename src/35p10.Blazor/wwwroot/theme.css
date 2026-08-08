@@ -1,0 +1,15 @@
+:root {
+    --win98-bg: #e7e7e7;
+    --win98-surface: #f4f4f4;
+    --win98-surface-soft: #ededed;
+    --win98-shadow-dark: #b6b6b6;
+    --win98-shadow-mid: #c9c9c9;
+    --win98-highlight: #ffffff;
+    --win98-highlight-soft: #fafafa;
+    --win98-blue: #1BA1E2;
+    --win98-blue-strong: #1277a7;
+    --win98-text: #181818;
+    --win98-danger: #8f3a3a;
+    --ui-border: #c6c6c6;
+    --ui-border-strong: #a9a9a9;
+}
