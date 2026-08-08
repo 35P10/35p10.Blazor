@@ -1,0 +1,52 @@
+@namespace k35p10.Blazor
+@typeparam TValue
+
+<select id="@Id"
+        class="@CssClass"
+        disabled="@Disabled"
+        value="@Value?.ToString()"
+        @attributes="AdditionalAttributes"
+        @onchange="HandleChange">
+    @ChildContent
+</select>
+
+@code {
+    [Parameter] public TValue Value { get; set; } = default!;
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "field-input" : $"field-input {Class}";
+
+    private async Task HandleChange(ChangeEventArgs e)
+    {
+        var converted = ConvertValue(e.Value?.ToString());
+        Value = converted;
+        await ValueChanged.InvokeAsync(converted);
+    }
+
+    private static TValue ConvertValue(string? raw)
+    {
+        if (string.IsNullOrEmpty(raw))
+        {
+            return default!;
+        }
+
+        var targetType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
+
+        if (targetType == typeof(string))
+        {
+            return (TValue)(object)raw;
+        }
+
+        if (targetType.IsEnum)
+        {
+            return (TValue)Enum.Parse(targetType, raw);
+        }
+
+        return (TValue)Convert.ChangeType(raw, targetType, CultureInfo.InvariantCulture);
+    }
+}

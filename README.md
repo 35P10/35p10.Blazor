@@ -63,6 +63,32 @@ An optional `Color` parameter (`KColor`) overrides the variant's default color i
 
 Each `KColor` member maps directly to its `var(--win98-...)` expression via the `ToVar()` extension method (`KColor.Danger.ToVar()` → `"var(--win98-danger, #8f3a3a)"`), so a component just does `style="color: @Color.Value.ToVar()"` — no intermediate CSS class or lookup table to keep in sync.
 
+## Form inputs
+
+```razor
+<KTextInput @bind-Value="SessionName" Placeholder="Session name" MaxLength="100" />
+<KNumberInput TValue="double" @bind-Value="Latitude" Step="any" />
+<KNumberInput TValue="int" @bind-Value="CubemapFaceSize" Min="64" Max="8192" Step="64" />
+<KSelect @bind-Value="TrialToAssignId">
+    <option value="">Add trial</option>
+    @foreach (var trial in AvailableTrials)
+    {
+        <option value="@trial.Id">@trial.Name</option>
+    }
+</KSelect>
+<KTextArea @bind-Value="Notes" MaxLength="2000" />
+<KTextArea @bind-Value="PanoUrl" Monospace="true" />
+```
+
+All four share the same `field-input` look (padding, border, radius, background, focus ring) — one visual language for every form control instead of each page re-declaring `padding: 0.6rem 0.75rem; border: 1px solid var(--ui-border); ...` verbatim. They're plain bindable wrapper components (`Value`/`ValueChanged`, so `@bind-Value` works) — no dependency on `EditForm`/`EditContext`, since none of this app's forms use one.
+
+- `KTextInput` — wraps `<input>`; `Type` defaults to `"text"` but can be set to any simple input type that doesn't need its own component (e.g. `"email"`, `"password"`).
+- `KNumberInput<TValue>` — wraps `<input type="number">`; generic over any `struct` numeric type implementing `IParsable<TValue>` (double, int, float, ...), parsed/formatted with `CultureInfo.InvariantCulture` so the decimal separator doesn't depend on the browser's locale. `Value` is always `TValue?` (nullable) — if you're binding to a NON-nullable numeric property, `@bind-Value` won't compile; wire it manually instead: `Value="@Prop" ValueChanged="@((int? v) => Prop = v ?? Prop)"`.
+- `KSelect<TValue>` — wraps `<select>`; pass `<option>` elements as `ChildContent` exactly as you would natively. Generic over `string` or any `enum` (converted internally via `Enum.Parse`/`Convert.ChangeType`). Unlike `KNumberInput`, `Value` is plain `TValue` (not nullable) — an unconstrained generic's `TValue?` erases to non-nullable for value-type instantiations in C#, so keeping it nullable there would have made `enum`/`string` binding inconsistent. **Type inference gotcha**: when `ValueChanged` is a bare method group (e.g. `ValueChanged="OnModelChanged"` rather than a lambda), Razor sometimes fails to infer `TValue` from `Value` alone and errors with `cannot convert from 'method group' to 'EventCallback'`. If you hit that, add `TValue="YourType"` explicitly on the tag.
+- `KTextArea` — wraps `<textarea>`; `resize: vertical` by default, plus an optional `Monospace` flag for the one legitimate outlier found in the app (a textarea for pasting a URL).
+
+Deliberately NOT built yet: a checkbox or range-slider component. The existing checkboxes/sliders in the app are too few and too varied in surrounding layout to generalize well — extracting them now would mean designing without enough real usage to learn from.
+
 ## Theming
 
 The full color palette (the "win98" design system) lives in `wwwroot/theme.css` as `:root` custom properties. Link it once from the host app's `index.html`/`_Host`/`App.razor`, before any page-specific stylesheet:
