@@ -36,7 +36,7 @@ Reusable Blazor components: blog-style article pages (header, sections, a scroll
     </ChildContent>
 </KCard>
 
-<KButton Variant="@KButtonVariant.Primary" OnClick="Save">Save</KButton>
+<KButton Variant="KButtonVariant.Primary" OnClick="Save">Save</KButton>
 <KButton Href="/back">Back</KButton>
 ```
 
@@ -45,15 +45,19 @@ Reusable Blazor components: blog-style article pages (header, sections, a scroll
 ## Typography
 
 ```razor
-<KText Variant="@KTextVariant.Title">GazeLab</KText>
-<KText Variant="@KTextVariant.Caption">Lab</KText>
-<KText Variant="@KTextVariant.Lead">Informes de investigación y herramientas del laboratorio.</KText>
+<KText Variant="KTextVariant.Title">GazeLab</KText>
+<KText Variant="KTextVariant.Caption">Lab</KText>
+<KText Variant="KTextVariant.Lead">Informes de investigación y herramientas del laboratorio.</KText>
 <KText>Default body copy.</KText>
 ```
 
-`KTextVariant` covers `Title` (h1, 1.45rem/700), `Subtitle` (h2, 1.05rem/700), `Body` (p, 0.9rem — the default), `Lead` (p, 0.95rem, #444), `Caption` (p, 0.72rem/600, uppercase, #777 — the "eyebrow" label style already used in `KBlogHeader`/`KBlogToc`), and `Muted` (p, 0.82rem, #555). Each variant renders a sensible default HTML tag; override it with `Tag="h3"` (or `"span"`, `"p"`, etc.) when the semantic heading level needs to differ from the visual style.
+`KTextVariant` covers two scales. The **dashboard/chrome scale** (page titles, panel headers, meta text — what `KCard`/`KButton`-based UIs use): `Title` (h1, 1.45rem/700), `Subtitle` (h2, 1.05rem/700), `Body` (p, 0.9rem — the default), `Lead` (p, 0.95rem, #444), `Caption` (p, 0.72rem/600, uppercase, #777 — the "eyebrow" label style), and `Muted` (p, 0.82rem, #555).
 
-An optional `Color` parameter (`KColor`) overrides the variant's default color independently of size/weight — e.g. a `Title` that needs to read as an error: `<KText Variant="@KTextVariant.Title" Color="@KColor.Danger">Failed</KText>`. Options: `Muted` (`--win98-muted`), `Primary` (`--win98-blue-strong`), `Danger` (`--win98-danger`), `Success` (`--win98-success`), `Warning` (`--win98-warning`) — the same status colors already used for connection/recording state pills across the app. Leave `Color` unset to keep the variant's own color.
+The **article scale** (matches `KBlogHeader`/`KBlogSection`'s own typography, meant for long-form reading rather than app chrome) — prefixed `Blog*` so they're never confused with the dashboard scale: `BlogDisplay` (h1, 2rem/700, tight letter-spacing — the article hero title), `BlogSectionHeading` (h2, 1.2rem/600, with a bottom border — the article section divider), `BlogByline` (p, 0.78rem, #777, no uppercase — the meta/date line under a `BlogDisplay` title), and `BlogIntro` (p, 1.05rem, #444 — a larger lead paragraph for article openings). These intentionally do NOT match the dashboard scale's `Title`/`Caption`/`Lead` sizes — blog reading typography is meant to feel distinct from panel chrome, not homogenized with it. `KBlogHeader`/`KBlogSection`/`KBlogToc` already use these internally.
+
+Each variant renders a sensible default HTML tag; override it with `Tag="h3"` (or `"span"`, `"p"`, etc.) when the semantic heading level needs to differ from the visual style.
+
+An optional `Color` parameter (`KColor`) overrides the variant's default color independently of size/weight — e.g. a `Title` that needs to read as an error: `<KText Variant="KTextVariant.Title" Color="KColor.Danger">Failed</KText>`. Options: `Muted` (`--win98-muted`), `Primary` (`--win98-blue-strong`), `Danger` (`--win98-danger`), `Success` (`--win98-success`), `Warning` (`--win98-warning`) — the same status colors already used for connection/recording state pills across the app. Leave `Color` unset to keep the variant's own color.
 
 `KColor` is a general-purpose semantic color token, not tied to `KText` — it's the natural type to reach for on any future component (badges, borders, icons, ...) that needs one of these five status colors. `KButtonVariant` was kept separate on purpose: a button's `Default` variant is a distinct neutral chrome, not just "no color," so it isn't a good fit for `KColor`'s "unset = inherit" semantics.
 

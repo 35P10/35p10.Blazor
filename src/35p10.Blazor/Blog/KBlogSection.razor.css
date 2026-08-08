@@ -3,13 +3,8 @@
     scroll-margin-top: 0.75rem;
 }
 
-.blog-section h2 {
+::deep .blog-section-heading {
     margin: 0 0 0.85rem;
-    padding-bottom: 0.45rem;
-    border-bottom: 1px solid var(--ui-border);
-    font-size: 1.2rem;
-    font-weight: 600;
-    line-height: 1.35;
 }
 
 .blog-section-body {

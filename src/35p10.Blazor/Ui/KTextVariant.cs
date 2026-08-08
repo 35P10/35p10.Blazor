@@ -8,4 +8,8 @@ public enum KTextVariant
     Lead,
     Caption,
     Muted,
+    BlogDisplay,
+    BlogSectionHeading,
+    BlogByline,
+    BlogIntro,
 }

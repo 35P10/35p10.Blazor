@@ -3,12 +3,12 @@
 <header class="blog-header">
     @if (Meta is not null)
     {
-        <p class="blog-meta">@Meta</p>
+        <KText Variant="KTextVariant.BlogByline" Class="blog-meta">@Meta</KText>
     }
-    <h1>@Title</h1>
+    <KText Variant="KTextVariant.BlogDisplay">@Title</KText>
     @if (Lead is not null)
     {
-        <p class="blog-lead">@Lead</p>
+        <KText Variant="KTextVariant.BlogIntro" Class="blog-lead">@Lead</KText>
     }
 </header>
 

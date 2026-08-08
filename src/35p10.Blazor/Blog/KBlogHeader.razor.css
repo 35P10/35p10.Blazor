@@ -2,24 +2,10 @@
     margin-bottom: 2rem;
 }
 
-.blog-meta {
+::deep .blog-meta {
     margin: 0 0 0.5rem;
-    color: #777;
-    font-size: 0.78rem;
-    letter-spacing: 0.02em;
 }
 
-.blog-header h1 {
-    margin: 0;
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-}
-
-.blog-lead {
+::deep .blog-lead {
     margin: 0.85rem 0 0;
-    color: #444;
-    font-size: 1.05rem;
-    line-height: 1.6;
 }
