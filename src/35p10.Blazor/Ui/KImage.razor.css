@@ -1,0 +1,17 @@
+.image-frame {
+    position: relative;
+    display: block;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--ui-border, #a0a0a0);
+    border-radius: 12px;
+    background: #eee;
+}
+
+.image-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

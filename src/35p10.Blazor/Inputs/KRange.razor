@@ -1,0 +1,46 @@
+@namespace k35p10.Blazor
+@typeparam TValue where TValue : struct, IParsable<TValue>, IFormattable
+
+<label class="@CssClass">
+    @if (ChildContent is not null)
+    {
+        <span>@ChildContent</span>
+    }
+    <input type="range"
+           min="@Min"
+           max="@Max"
+           step="@Step"
+           value="@Value.ToString(null, CultureInfo.InvariantCulture)"
+           disabled="@Disabled"
+           @attributes="AdditionalAttributes"
+           @oninput="HandleInput" />
+    @if (ValueLabel is not null)
+    {
+        <strong>@ValueLabel</strong>
+    }
+</label>
+
+@code {
+    [Parameter] public TValue Value { get; set; }
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+    [Parameter] public string? Min { get; set; }
+    [Parameter] public string? Max { get; set; }
+    [Parameter] public string Step { get; set; } = "1";
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? ValueLabel { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "range" : $"range {Class}";
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        var raw = e.Value?.ToString();
+        if (!string.IsNullOrWhiteSpace(raw) && TValue.TryParse(raw, CultureInfo.InvariantCulture, out var value))
+        {
+            Value = value;
+            await ValueChanged.InvokeAsync(value);
+        }
+    }
+}

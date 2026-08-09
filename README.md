@@ -38,9 +38,15 @@ Reusable Blazor components: blog-style article pages (header, sections, a scroll
 
 <KButton Variant="KButtonVariant.Primary" OnClick="Save">Save</KButton>
 <KButton Href="/back">Back</KButton>
+
+<KButton Variant="KButtonVariant.Choice" Active="@isSelected" OnClick="() => Select(item.Id)">
+    <span>@item.Name</span>
+</KButton>
 ```
 
-`KCard` renders a `<div>` (or an `<a>` when `Href` is set) with class `card`. `KButton` renders a `<button>` (or an `<a>` when `Href` is set) with class `action-button`, plus `primary`/`danger`/`icon-only` modifiers driven by the `Variant`/`IconOnly` parameters.
+`KCard` renders a `<div>` (or an `<a>` when `Href` is set) with class `card`. `KButton` renders a `<button>` (or an `<a>` when `Href` is set) with class `action-button`, plus `primary`/`danger`/`icon-only`/`choice` modifiers driven by the `Variant`/`IconOnly` parameters.
+
+`KButtonVariant.Choice` covers the "selectable list item" pattern found duplicated across 5 files (`question-chip`, `evaluator-item`, `image-thumb`, `trial-tab`, `trial-item`): a full-width, left-aligned row that's gray by default and gets a blue-tinted border+background when selected — a genuinely different look from `Primary`/`Danger` (which stay compact/inline for one-off actions), not just a color swap. Pair it with the separate `Active` bool parameter (works with any variant, but only `Choice` has visual styling for `.is-active`) instead of computing `Variant` conditionally — `Active="@isSelected"` reads clearer than `Variant="@(isSelected ? ... : ...)"` at call sites where "selected" isn't the same idea as "primary action". Each of the 5 migrated usages needed its own internal layout (a 2-column grid for `question-chip`, a checkmark+body grid for `evaluator-item`, ...) which `Choice`'s own CSS doesn't dictate — add `Class="your-name"` and a page-level `::deep .action-button.your-name { ... }` rule for whatever internal grid/gap/background the specific list needs on top of the shared base look.
 
 ## Typography
 
@@ -87,7 +93,31 @@ All four share the same `field-input` look (padding, border, radius, background,
 - `KSelect<TValue>` — wraps `<select>`; pass `<option>` elements as `ChildContent` exactly as you would natively. Generic over `string` or any `enum` (converted internally via `Enum.Parse`/`Convert.ChangeType`). Unlike `KNumberInput`, `Value` is plain `TValue` (not nullable) — an unconstrained generic's `TValue?` erases to non-nullable for value-type instantiations in C#, so keeping it nullable there would have made `enum`/`string` binding inconsistent. **Type inference gotcha**: when `ValueChanged` is a bare method group (e.g. `ValueChanged="OnModelChanged"` rather than a lambda), Razor sometimes fails to infer `TValue` from `Value` alone and errors with `cannot convert from 'method group' to 'EventCallback'`. If you hit that, add `TValue="YourType"` explicitly on the tag.
 - `KTextArea` — wraps `<textarea>`; `resize: vertical` by default, plus an optional `Monospace` flag for the one legitimate outlier found in the app (a textarea for pasting a URL).
 
-Deliberately NOT built yet: a checkbox or range-slider component. The existing checkboxes/sliders in the app are too few and too varied in surrounding layout to generalize well — extracting them now would mean designing without enough real usage to learn from.
+## Checkbox, range, file upload, image
+
+```razor
+<KCheckbox @bind-Value="ExportPanorama">Panorama</KCheckbox>
+
+<KRange TValue="double" Min="0.5" Max="3" Step="0.1" @bind-Value="HeatmapLevel">Level</KRange>
+<KRange TValue="int" Min="0" Max="@MaxSampleIndex.ToString()" Step="1" Value="SelectedSampleIndex" ValueChanged="HandleTimelineInput" />
+
+<KFileUpload Disabled="IsBusy" OnChange="OnFileSelectedAsync" Accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+    <UiIcon Name="image-add" />
+    <span>Choose image</span>
+</KFileUpload>
+
+<KImage Src="@Api.GetImageUrl(Session.Id, image.Id)" Alt="@GetImageName(image)">
+    @if (isActive)
+    {
+        <span class="active-badge">Active</span>
+    }
+</KImage>
+```
+
+- `KCheckbox` — a `<label>` wrapping `<input type="checkbox">` + a `<span>` for `ChildContent`; bindable via `Value`/`ValueChanged` (`bool`). Grounded in `StreetView.razor`'s 5 export-format checkboxes and `SessionControl.razor`'s trial-picker checkbox.
+- `KRange<TValue>` — a `<label>` wrapping an optional leading `ChildContent` span, `<input type="range">`, and an optional trailing `ValueLabel`. Generic over any `struct` implementing `IParsable<TValue>`/`IFormattable` (double, int, ...), parsed with `CultureInfo.InvariantCulture`. `Min`/`Max` are plain strings (pass-through to the native attribute), so a non-string value needs `.ToString()` at the call site (e.g. `Max="@MaxSampleIndex.ToString()"`). Grounded in `Player.razor`'s heatmap-level slider and timeline scrubber. **Not** used for `ErpFovExplorer.razor`'s FOV slider — that component is out of scope for this library (360° viewer content, not dashboard chrome).
+- `KFileUpload` — a `<label>` wrapping `ChildContent` (icon + text) and Microsoft's built-in `<InputFile>`, visually hidden and stretched over the label so the whole label is the click target. Always renders the solid blue/white "primary" look — the app's original `.image-upload` CSS declared a neutral-gray variant that a later same-specificity rule always overrode, so blue/white was the only look that ever actually rendered; `KFileUpload` matches that real behavior rather than the unreachable rule. Grounded in `Trials.razor` and `Segmentation.razor`'s image-upload buttons.
+- `KImage` — a `<div>` framing an `<img>` (rounded border, `overflow: hidden`, `object-fit: cover`) plus `ChildContent` for an absolutely-positioned overlay badge, if any. `AspectRatio` defaults to `"2 / 1"` (the only ratio found in the app) and accepts any valid CSS `aspect-ratio` value. Grounded in `SessionControl.razor`'s `.image-preview` image-grid tiles. **Not** used for `Trials.razor`'s `.trial-image` cards or `Segmentation.razor`'s `<figure>` previews — both mix the image with unrelated sibling content (a metadata form, conditional fallback states) rather than just framing it with an optional overlay, so wrapping them would either double up the border/radius or force an incorrect aspect-ratio onto the whole card.
 
 ## Badges
 

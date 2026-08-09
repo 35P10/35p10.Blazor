@@ -1,0 +1,28 @@
+.file-upload {
+    position: relative;
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--win98-blue-strong, #1277a7);
+    border-radius: 10px;
+    background: var(--win98-blue, #1ba1e2);
+    color: #fff;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.file-upload.is-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.file-upload input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}

@@ -41,3 +41,24 @@
 .action-button.icon-only ::deep .ui-icon {
     margin: 0;
 }
+
+.action-button.choice {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    background: #dcdcdc;
+    color: inherit;
+    font-weight: 400;
+    text-align: left;
+    white-space: normal;
+}
+
+.action-button.choice:hover,
+.action-button.choice.is-active {
+    background: #e7e7e7;
+}
+
+.action-button.choice.is-active {
+    border-color: rgba(27, 161, 226, 0.45);
+    background: rgba(27, 161, 226, 0.12);
+}

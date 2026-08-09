@@ -1,0 +1,14 @@
+.range {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.range input[type="range"] {
+    width: 100%;
+    accent-color: var(--win98-blue, #1ba1e2);
+}
+
+.range strong {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
