@@ -119,6 +119,17 @@ All four share the same `field-input` look (padding, border, radius, background,
 - `KFileUpload` — a `<label>` wrapping `ChildContent` (icon + text) and Microsoft's built-in `<InputFile>`, visually hidden and stretched over the label so the whole label is the click target. Always renders the solid blue/white "primary" look — the app's original `.image-upload` CSS declared a neutral-gray variant that a later same-specificity rule always overrode, so blue/white was the only look that ever actually rendered; `KFileUpload` matches that real behavior rather than the unreachable rule. Grounded in `Trials.razor` and `Segmentation.razor`'s image-upload buttons.
 - `KImage` — a `<div>` framing an `<img>` (rounded border, `overflow: hidden`, `object-fit: cover`) plus `ChildContent` for an absolutely-positioned overlay badge, if any. `AspectRatio` defaults to `"2 / 1"` (the only ratio found in the app) and accepts any valid CSS `aspect-ratio` value. Grounded in `SessionControl.razor`'s `.image-preview` image-grid tiles. **Not** used for `Trials.razor`'s `.trial-image` cards or `Segmentation.razor`'s `<figure>` previews — both mix the image with unrelated sibling content (a metadata form, conditional fallback states) rather than just framing it with an optional overlay, so wrapping them would either double up the border/radius or force an incorrect aspect-ratio onto the whole card.
 
+## Icons
+
+```razor
+<KIcon Name="KIconName.Refresh" />
+<KIcon Name="KIconName.Trash" Size="1.25rem" />
+```
+
+`KIcon` replaces `GazeLab.Web`'s `UiIcon` (string `Name` lookup) with a `KIconName` enum — one value per icon path, so a typo'd name is a compile error instead of a silent fallback to the default glyph. `Size` is a plain CSS length string (default `"1rem"`) applied directly as inline `width`/`height` — kept as a free-form string rather than a size-tier enum, since the two real sizes found in the app (`1rem` action icons, `1.25rem` nav icons) are just two arbitrary points, not a meaningful small/medium/large scale.
+
+Two icon families exist in `KIconName`: the action-icon set (`Plus`, `Refresh`, `ImageAdd`, `Trash`, `ChevronUp`, `ChevronDown`, `ChevronLeft`, `ChevronRight`, `Save`, `Aoi`, `Edit`, `Close`) migrated from `UiIcon`, and the `Nav*`-prefixed set (`NavHome`, `NavChartGaze`, `NavSessionControl`, `NavTrials`, `NavSessions`, `NavLiveGaze`, `NavPlayer`, `NavStreetView`, `NavSegmentation`) migrated from `NavMenu.razor`'s inline `<svg>` sidebar icons. `ChevronLeft`/`ChevronRight` were added alongside the other two to round out a full 4-direction chevron set, replacing `NavMenu.razor`'s `"«"`/`"»"` text-glyph sidebar-collapse toggle.
+
 ## Badges
 
 ```razor
@@ -160,6 +171,24 @@ Deliberately left OUT of this unification: `SessionControl`'s `.active-badge` an
 - `KSpinner` — a single `<span class="spinner">`, the rotating-border loading indicator already duplicated (with two different `@keyframes` names) in `SessionControl.razor`/`Player.razor`. Compose it with your own text/`KCard` wrapper as needed — it doesn't bundle a label, matching how narrowly-scoped `KButton`/`KCard` are.
 - `KDialog` — a backdrop + centered window modal (click backdrop or the built-in "Close" button to dismiss; clicks inside the window don't propagate to the backdrop). `@bind-IsOpen` controls visibility; `OnClose` fires for any side effects beyond closing. Only one dialog existed in the app before this (`Player.razor`'s image-source picker) — the API is intentionally minimal (`Title` + `ChildContent`) since there wasn't more real usage to design against yet.
 - `KTable` — a thin wrapper around a native `<table>`: you still write `<thead>`/`<tbody>`/`<tr>`/`<th>`/`<td>` yourself (tables have too much semantic structure to hide behind a component API), `KTable` just supplies the shared container look (scroll wrapper, border, sticky header, row font-size/padding) that was previously copy-pasted per page. Two opt-in row modifier classes — `table-row-clickable` (hover + pointer cursor) and `table-row-active` (current-row highlight) — cover the interaction patterns already found in the app (`Player.razor`'s sample rows, `ExperimentResultsView`'s comparison rows).
+
+## Toasts
+
+```razor
+@inject ToastService ToastService
+@implements IDisposable
+
+<KToastStack Toasts="@Items" OnDismiss="@(id => ToastService.Dismiss(id))" />
+
+@code {
+    IReadOnlyList<KToastItem> Items => ToastService.Toasts
+        .Select(toast => new KToastItem(toast.Id, toast.Message, toast.Kind == ToastKind.Error ? KColor.Danger : KColor.Primary, toast.Duration))
+        .ToList();
+    // OnInitialized/Dispose subscribe/unsubscribe ToastService.Changed to re-render on new toasts, as before.
+}
+```
+
+`KToastStack` is purely presentational — it renders a fixed top-right stack of dismissible, auto-expiring toast messages from an `IReadOnlyList<KToastItem>` (`Id`, `Message`, `Color`, `Duration`) and an `OnDismiss` callback. Unlike every other component here, this one didn't already have *duplicated* markup to unify — `ToastHost.razor` was (and still is) the only toast host in the app. It's extracted anyway because the actual scheduling/dismissal logic (`ToastService`, `AppToast`, `ToastKind`) is legitimate app-specific state management that doesn't belong in a UI library, while the rendering underneath it is pure CSS with zero GazeLab-specific logic — so only that rendering layer moved. `Color` reuses `KColor` directly (`Primary` for info, `Danger` for error) rather than a separate variant enum, since the accent colors already matched `KColor.Primary`/`KColor.Danger`'s underlying CSS vars exactly.
 
 ## Theming
 

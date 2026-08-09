@@ -1,0 +1,26 @@
+@namespace k35p10.Blazor
+
+@if (Toasts.Count > 0)
+{
+    <div class="toast-stack" aria-live="polite">
+        @foreach (var toast in Toasts)
+        {
+            <div @key="toast.Id"
+                 class="@(toast.Color == KColor.Danger ? "toast-message is-danger" : "toast-message")"
+                 style="--toast-accent: @toast.Color.ToVar(); --toast-life: @(toast.Duration.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture))s">
+                <span class="toast-text">@toast.Message</span>
+                <button type="button"
+                        class="toast-dismiss"
+                        aria-label="Dismiss"
+                        @onclick="() => OnDismiss.InvokeAsync(toast.Id)">
+                    ×
+                </button>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<KToastItem> Toasts { get; set; } = Array.Empty<KToastItem>();
+    [Parameter] public EventCallback<Guid> OnDismiss { get; set; }
+}
