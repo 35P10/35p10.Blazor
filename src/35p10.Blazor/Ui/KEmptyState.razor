@@ -1,0 +1,13 @@
+@namespace k35p10.Blazor
+
+<KCard Class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</KCard>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "empty-state" : $"empty-state {Class}";
+}

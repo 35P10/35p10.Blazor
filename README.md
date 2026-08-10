@@ -245,6 +245,39 @@ Deliberately left OUT of this unification: `SessionControl`'s `.active-badge` an
 
 Deliberately NOT included: the surrounding page shell (`MainLayout.razor`'s `.page`/`.sidebar`/`main` grid, sticky positioning, the player-route upload bar). That's a separate, deeper layer — `KSidebarNav` is just what goes *inside* the sidebar slot a host layout provides.
 
+## Empty states
+
+```razor
+<KEmptyState>No trials.</KEmptyState>
+
+<KEmptyState>
+    <KText Variant="KTextVariant.Body">Image not found.</KText>
+    <KButton Href="trials">Back</KButton>
+</KEmptyState>
+```
+
+`KEmptyState` is a thin `KCard` wrapper (centered, muted text by default) for the "loading..."/"no data" placeholder that showed up almost verbatim in 4 pages (`Trials`, `TrialImageEditor`, `Segmentation`, `Sessions` — 8 call sites total). Plain `ChildContent`, same as `KCard` — most callers just pass a string; one page's "not found" state pairs it with a `KButton`, which is why it stayed `RenderFragment` instead of a `Message` string parameter. The four pages weren't styled identically (two centered the text, two didn't; one left-aligned its button), so unifying meant picking the centered look as the default — a small, deliberate visual convergence rather than a variant per page.
+
+## Stat lists
+
+```razor
+<KStatList>
+    <div><dt>Pano</dt><dd>@LastMetadata.PanoId</dd></div>
+    <div><dt>Date</dt><dd>@(LastMetadata.Date ?? "—")</dd></div>
+</KStatList>
+
+<KStatList Variant="KStatListVariant.Stacked">
+    <div><dt>Started</dt><dd>@Session.Experiment.StartedAt</dd></div>
+</KStatList>
+
+<KStatList Variant="KStatListVariant.Grid">
+    <div><dt>Time</dt><dd>@FormatNumber(CurrentSample.T)s</dd></div>
+    <!-- ...11 stat pairs total -->
+</KStatList>
+```
+
+`KStatList` wraps a `<dl>`; like `KTable`, you still author the `<div><dt>/<dd></div>` pairs yourself — only the container class and the three variant look-and-feels moved here. Found as three genuinely different visual treatments across `StreetView`/`Player` (`Inline` — a fixed label column beside the value; `Stacked` — small uppercase label above the value, used for a 2-item header strip; `Grid` — each pair in its own bordered/shaded tile, used for an 11-field raw-sample dump), so `Variant` picks the shape instead of forcing one look across all three call sites.
+
 ## Toasts
 
 ```razor

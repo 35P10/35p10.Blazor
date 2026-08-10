@@ -1,0 +1,70 @@
+.stat-list {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+}
+
+.stat-list.inline > div {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 0.5rem;
+}
+
+.stat-list.inline dt {
+    margin: 0;
+    color: #666;
+    font-weight: 700;
+}
+
+.stat-list.inline dd {
+    margin: 0;
+    word-break: break-word;
+}
+
+.stat-list.stacked > div {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.stat-list.stacked dt {
+    color: #555;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.stat-list.stacked dd {
+    margin: 0;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stat-list.grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.stat-list.grid > div {
+    padding: 0.7rem;
+    background: #efefef;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+.stat-list.grid dt {
+    margin-bottom: 0.25rem;
+    color: #555;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.stat-list.grid dd {
+    margin: 0;
+    color: #000;
+    font-weight: 700;
+    word-break: break-word;
+}

@@ -1,0 +1,32 @@
+@namespace k35p10.Blazor
+
+<dl class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</dl>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public KStatListVariant Variant { get; set; } = KStatListVariant.Inline;
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass
+    {
+        get
+        {
+            var classes = new List<string> { "stat-list" };
+            classes.Add(Variant switch
+            {
+                KStatListVariant.Stacked => "stacked",
+                KStatListVariant.Grid => "grid",
+                _ => "inline",
+            });
+            if (!string.IsNullOrWhiteSpace(Class))
+            {
+                classes.Add(Class);
+            }
+
+            return string.Join(' ', classes);
+        }
+    }
+}
