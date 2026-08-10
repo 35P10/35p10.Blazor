@@ -1,3 +1,16 @@
+.top-row {
+    min-height: 4rem;
+}
+
+.top-row-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 1rem;
+}
+
 .nav-actions {
     display: flex;
     align-items: center;
@@ -5,9 +18,15 @@
 }
 
 .navbar-toggler {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
     background: var(--win98-surface-soft);
     border: 1px solid var(--ui-border);
     border-radius: 10px;
+    color: #000;
 }
 
 .sidebar-toggle {
@@ -18,10 +37,6 @@
     color: #000;
     border: 1px solid var(--ui-border);
     border-radius: 10px;
-}
-
-.top-row {
-    min-height: 4rem;
 }
 
 .navbar-brand {
@@ -43,9 +58,21 @@
     margin-right: 0.75rem;
 }
 
+.collapse {
+    display: none;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
 .nav-item {
+    padding: 0 1rem 0.5rem;
     font-size: 0.9rem;
-    padding-bottom: 0.5rem;
 }
 
     .nav-item:first-of-type {
@@ -65,6 +92,7 @@
         padding: 0 0.75rem;
         border: 1px solid transparent;
         border-radius: 10px;
+        text-decoration: none;
     }
 
 .nav-item ::deep a.active {
@@ -99,17 +127,17 @@
         overflow-y: auto;
     }
 
-    .nav-scrollable.is-collapsed .nav-item {
+    .nav-scrollable.is-collapsed .nav-item:not(.nav-item-text-only) {
         padding-left: 0 !important;
         padding-right: 0 !important;
     }
 
-    .nav-scrollable.is-collapsed .nav-item ::deep a {
+    .nav-scrollable.is-collapsed .nav-item:not(.nav-item-text-only) ::deep a {
         justify-content: center;
         margin: 0 0.75rem;
     }
 
-    .nav-scrollable.is-collapsed .nav-label {
+    .nav-scrollable.is-collapsed .nav-item:not(.nav-item-text-only) .nav-label {
         display: none;
     }
 

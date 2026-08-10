@@ -1,27 +1,30 @@
 @namespace k35p10.Blazor
 @using Microsoft.AspNetCore.Components.Routing
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
+<div class="top-row">
+    <div class="top-row-inner">
         <a class="navbar-brand @(IsCollapsed ? "is-collapsed" : string.Empty)" href="@BrandHref">@BrandText</a>
         <div class="nav-actions">
             <button title="Collapse sidebar" class="sidebar-toggle" @onclick="ToggleCollapsedAsync">
                 <KIcon Name="@(IsCollapsed ? KIconName.ChevronRight : KIconName.ChevronLeft)" Class="sidebar-toggle-icon" />
             </button>
             <button title="Toggle navigation menu" class="navbar-toggler" @onclick="ToggleMobileMenu">
-                <span class="navbar-toggler-icon"></span>
+                <KIcon Name="KIconName.Menu" />
             </button>
         </div>
     </div>
 </div>
 
 <div class="@MobileMenuCssClass nav-scrollable @(IsCollapsed ? "is-collapsed" : string.Empty)" @onclick="HandleNavAreaClick">
-    <nav class="nav flex-column">
+    <nav class="sidebar-nav">
         @foreach (var item in Items)
         {
-            <div class="nav-item px-3">
+            <div class="nav-item @(item.Icon is null ? "nav-item-text-only" : string.Empty)">
                 <NavLink class="nav-link" href="@item.Href" Match="@(item.MatchAll ? NavLinkMatch.All : NavLinkMatch.Prefix)" title="@item.Label" aria-label="@item.Label">
-                    <KIcon Name="@item.Icon" Class="nav-icon" Size="1.25rem" />
+                    @if (item.Icon is { } icon)
+                    {
+                        <KIcon Name="@icon" Class="nav-icon" Size="1.25rem" />
+                    }
                     <span class="nav-label">@item.Label</span>
                 </NavLink>
             </div>

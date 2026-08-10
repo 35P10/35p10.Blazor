@@ -14,6 +14,7 @@ public enum KIconName
     Aoi,
     Edit,
     Close,
+    Menu,
     NavHome,
     NavChartGaze,
     NavSessionControl,

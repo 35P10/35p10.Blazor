@@ -1,0 +1,16 @@
+html, body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: var(--win98-bg, #e7e7e7);
+    color: var(--win98-text, #181818);
+    font-size: 0.9rem;
+}
+
+a {
+    color: var(--win98-blue-strong, #1277a7);
+}
+
+code, pre {
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 10px;
+    background: #fff;
+}
