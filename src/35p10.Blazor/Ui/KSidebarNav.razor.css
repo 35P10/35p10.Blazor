@@ -1,0 +1,119 @@
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-toggler {
+    background: var(--win98-surface-soft);
+    border: 1px solid var(--ui-border);
+    border-radius: 10px;
+}
+
+.sidebar-toggle {
+    display: none;
+    width: 2.2rem;
+    height: 2.2rem;
+    background: var(--win98-surface-soft);
+    color: #000;
+    border: 1px solid var(--ui-border);
+    border-radius: 10px;
+}
+
+.top-row {
+    min-height: 4rem;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #000;
+    text-decoration: none;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.navbar-brand.is-collapsed {
+    display: none;
+}
+
+::deep .nav-icon {
+    margin-right: 0.75rem;
+}
+
+.nav-item {
+    font-size: 0.9rem;
+    padding-bottom: 0.5rem;
+}
+
+    .nav-item:first-of-type {
+        padding-top: 1rem;
+    }
+
+    .nav-item:last-of-type {
+        padding-bottom: 1rem;
+    }
+
+    .nav-item ::deep a {
+        color: #000;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        line-height: 3rem;
+        padding: 0 0.75rem;
+        border: 1px solid transparent;
+        border-radius: 10px;
+    }
+
+.nav-item ::deep a.active {
+    background: rgba(27, 161, 226, 0.14);
+    color: #111;
+    border-color: rgba(27, 161, 226, 0.45);
+}
+
+.nav-item ::deep a:hover {
+    background: rgba(27, 161, 226, 0.08);
+    color: #000;
+    border-color: rgba(27, 161, 226, 0.22);
+}
+
+@media (min-width: 641px) {
+    .navbar-toggler {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .collapse {
+        display: block;
+    }
+
+    .nav-scrollable {
+        height: calc(100vh - 3.5rem);
+        overflow-y: auto;
+    }
+
+    .nav-scrollable.is-collapsed .nav-item {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .nav-scrollable.is-collapsed .nav-item ::deep a {
+        justify-content: center;
+        margin: 0 0.75rem;
+    }
+
+    .nav-scrollable.is-collapsed .nav-label {
+        display: none;
+    }
+
+    .nav-scrollable.is-collapsed ::deep .nav-icon {
+        margin-right: 0;
+    }
+}

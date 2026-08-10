@@ -1,0 +1,32 @@
+@namespace k35p10.Blazor
+
+@if (Tag == "header")
+{
+    <header class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+        @if (Actions is not null)
+        {
+            @Actions
+        }
+    </header>
+}
+else
+{
+    <div class="@CssClass" @attributes="AdditionalAttributes">
+        @ChildContent
+        @if (Actions is not null)
+        {
+            @Actions
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public string Tag { get; set; } = "div";
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "section-header" : $"section-header {Class}";
+}

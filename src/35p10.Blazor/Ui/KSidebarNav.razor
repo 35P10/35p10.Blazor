@@ -1,0 +1,58 @@
+@namespace k35p10.Blazor
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand @(IsCollapsed ? "is-collapsed" : string.Empty)" href="@BrandHref">@BrandText</a>
+        <div class="nav-actions">
+            <button title="Collapse sidebar" class="sidebar-toggle" @onclick="ToggleCollapsedAsync">
+                <KIcon Name="@(IsCollapsed ? KIconName.ChevronRight : KIconName.ChevronLeft)" Class="sidebar-toggle-icon" />
+            </button>
+            <button title="Toggle navigation menu" class="navbar-toggler" @onclick="ToggleMobileMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="@MobileMenuCssClass nav-scrollable @(IsCollapsed ? "is-collapsed" : string.Empty)" @onclick="HandleNavAreaClick">
+    <nav class="nav flex-column">
+        @foreach (var item in Items)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="@item.Href" Match="@(item.MatchAll ? NavLinkMatch.All : NavLinkMatch.Prefix)" title="@item.Label" aria-label="@item.Label">
+                    <KIcon Name="@item.Icon" Class="nav-icon" Size="1.25rem" />
+                    <span class="nav-label">@item.Label</span>
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    [Parameter] public string BrandText { get; set; } = string.Empty;
+    [Parameter] public string BrandHref { get; set; } = "";
+    [Parameter] public IReadOnlyList<KNavItem> Items { get; set; } = Array.Empty<KNavItem>();
+    [Parameter] public bool IsCollapsed { get; set; }
+    [Parameter] public EventCallback<bool> IsCollapsedChanged { get; set; }
+
+    private bool isMobileMenuCollapsed = true;
+
+    private string? MobileMenuCssClass => isMobileMenuCollapsed ? "collapse" : null;
+
+    private async Task ToggleCollapsedAsync()
+    {
+        IsCollapsed = !IsCollapsed;
+        await IsCollapsedChanged.InvokeAsync(IsCollapsed);
+    }
+
+    private void ToggleMobileMenu()
+    {
+        isMobileMenuCollapsed = !isMobileMenuCollapsed;
+    }
+
+    private void HandleNavAreaClick()
+    {
+        isMobileMenuCollapsed = true;
+    }
+}

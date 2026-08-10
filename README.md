@@ -172,6 +172,46 @@ Deliberately left OUT of this unification: `SessionControl`'s `.active-badge` an
 - `KDialog` — a backdrop + centered window modal (click backdrop or the built-in "Close" button to dismiss; clicks inside the window don't propagate to the backdrop). `@bind-IsOpen` controls visibility; `OnClose` fires for any side effects beyond closing. Only one dialog existed in the app before this (`Player.razor`'s image-source picker) — the API is intentionally minimal (`Title` + `ChildContent`) since there wasn't more real usage to design against yet.
 - `KTable` — a thin wrapper around a native `<table>`: you still write `<thead>`/`<tbody>`/`<tr>`/`<th>`/`<td>` yourself (tables have too much semantic structure to hide behind a component API), `KTable` just supplies the shared container look (scroll wrapper, border, sticky header, row font-size/padding) that was previously copy-pasted per page. Two opt-in row modifier classes — `table-row-clickable` (hover + pointer cursor) and `table-row-active` (current-row highlight) — cover the interaction patterns already found in the app (`Player.razor`'s sample rows, `ExperimentResultsView`'s comparison rows).
 
+## Section headers
+
+```razor
+<KSectionHeader Tag="header" Class="trials-hero">
+    <ChildContent>
+        <div>
+            <KText Variant="KTextVariant.Title">Trials</KText>
+            <KText Variant="KTextVariant.Muted">@VisibleTrials.Count trial(s)</KText>
+        </div>
+    </ChildContent>
+    <Actions>
+        <KButton OnClick="LoadTrialsAsync">Refresh</KButton>
+    </Actions>
+</KSectionHeader>
+```
+
+`KSectionHeader` unifies the single most duplicated layout shape in the app: a flex row with a title on the left and optional actions (badge/button/pill-group) on the right, `justify-content: space-between`, stacking to a column below 640px. It was copy-pasted under at least five different class names (`X-hero` on nearly every page's top banner, `panel-head`/`section-head` on card/panel headers) with byte-identical CSS. Two named `RenderFragment` parameters: `ChildContent` (the title side) and `Actions` (optional, right side) — **when both are used, wrap `ChildContent` in an explicit `<ChildContent>` tag**; Razor's compiler rejects mixing bare/implicit child content with another named `RenderFragment` tag as siblings (`RZ9996`). If a fragment's content is conditional, put the `@if` *inside* the tag rather than around the tag itself — wrapping the `<Actions>` tag itself in `@if` trips the same compiler restriction even when `ChildContent` is explicit. `Tag` defaults to `"div"`; set `Tag="header"` for page-level banners that were a semantic `<header>` element. Pass the page's own class via `Class` and re-declare only the *extra* CSS properties the component doesn't provide (margin, a wider/narrower responsive breakpoint, etc.) with `::deep`.
+
+## Sidebar navigation
+
+```razor
+<KSidebarNav BrandText="GazeLab Studio"
+             Items="NavItems"
+             IsCollapsed="IsSidebarCollapsed"
+             IsCollapsedChanged="OnSidebarCollapsedChanged" />
+
+@code {
+    private static readonly IReadOnlyList<KNavItem> NavItems = new List<KNavItem>
+    {
+        new("", "Home", KIconName.NavHome, MatchAll: true),
+        new("trials", "Trials", KIconName.NavTrials),
+        // ...
+    };
+}
+```
+
+`KSidebarNav` is the collapsible win98-style sidebar shell — brand row with a collapse toggle (desktop) and a hamburger toggle (mobile, closes on nav click), plus the `<NavLink>` list itself with active/hover states. It replaced `GazeLab.Web`'s `NavMenu.razor`, which was 100% chrome (the CSS) hard-coded around one specific list of 9 routes — the chrome is the reusable part, so it moved here; the route list stays app-owned, passed in as `IReadOnlyList<KNavItem>` (`Href`, `Label`, `Icon`, `MatchAll` for the home/root link). `IsCollapsed`/`IsCollapsedChanged` bind the desktop collapse state (owned by the host layout, since it also affects the host's own `.sidebar` width — see `MainLayout.razor.css`'s `.sidebar.is-collapsed { width: 88px; }`); the mobile hamburger state is internal, matching the original. This is the first component here with a routing dependency (`Microsoft.AspNetCore.Components.Routing` for `NavLink`/`NavLinkMatch`) — every other component in this library is routing-agnostic.
+
+Deliberately NOT included: the surrounding page shell (`MainLayout.razor`'s `.page`/`.sidebar`/`main` grid, sticky positioning, the player-route upload bar). That's a separate, deeper layer — `KSidebarNav` is just what goes *inside* the sidebar slot a host layout provides.
+
 ## Toasts
 
 ```razor
