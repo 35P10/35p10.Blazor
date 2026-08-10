@@ -1,6 +1,6 @@
 @namespace k35p10.Blazor
 
-<header class="blog-header">
+<header class="@CssClass">
     @if (Meta is not null)
     {
         <KText Variant="KTextVariant.BlogByline" Class="blog-meta">@Meta</KText>
@@ -21,4 +21,9 @@
 
     [Parameter]
     public string? Lead { get; set; }
+
+    [Parameter]
+    public bool Centered { get; set; }
+
+    private string CssClass => Centered ? "blog-header centered" : "blog-header";
 }

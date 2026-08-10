@@ -22,6 +22,27 @@ Reusable Blazor components: blog-style article pages (header, sections, a scroll
 
 `KBlogArticle` builds the table of contents automatically from the `KBlogSection` children it renders, and handles smooth-scrolling to a section when a TOC entry is clicked. Component names are prefixed with `K` to avoid tag-name collisions with other component libraries; the underlying CSS classes (`blog-header`, `blog-section`, ...) are unprefixed.
 
+### Blog index / home page
+
+```razor
+<KBlogHeader Title="GazeLab" Meta="Lab" Lead="Informes de investigación y herramientas del laboratorio." Centered="true" />
+
+<ul class="home-index">
+    @foreach (var entry in Entries)
+    {
+        <li>
+            <KCard Href="@entry.Href" Class="home-entry">
+                <KText Variant="KTextVariant.Caption" Tag="span">@entry.Kind</KText>
+                <strong>@entry.Title</strong>
+                <KText Variant="KTextVariant.Muted" Tag="span">@entry.Summary</KText>
+            </KCard>
+        </li>
+    }
+</ul>
+```
+
+For a blog's landing page (masthead + intro + list of entries, as opposed to `KBlogHeader`'s usual left-aligned article-header role), pass `Centered="true"` — it center-aligns the byline/title/lead as a group without changing their typography. There's no dedicated "entries list" component: each project's entry cards differ enough (icon vs. no icon, `KCard` vs. something else) that a plain `<ul>` of `KCard`s — same pattern already used for panel lists elsewhere in this library's consuming app — covers it without forcing a new abstraction.
+
 ## UI usage
 
 ```razor
