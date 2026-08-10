@@ -1,4 +1,6 @@
 .top-row {
+    display: flex;
+    align-items: center;
     min-height: 4rem;
 }
 
@@ -7,8 +9,8 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    height: 100%;
-    padding: 0 1rem;
+    width: 100%;
+    padding: 0 1.5rem;
 }
 
 .nav-actions {

@@ -2,6 +2,14 @@
 
 Reusable Blazor components: blog-style article pages (header, sections, a scroll-spy table of contents, code blocks) and shared UI primitives (`KCard`, `KButton`).
 
+## Demo
+
+`demo/35p10.Blazor.Demo` is a small Blazor WebAssembly app that renders every component in this library, grouped the same way the source tree is (Layout, Typography, Actions, Forms, Feedback, Data, Blog), navigated via `KSidebarNav` — the demo's own chrome is built with the library it's demoing. Each section pairs a live example with the exact markup that produced it. Run it with:
+
+```
+dotnet run --project demo/35p10.Blazor.Demo/35p10.Blazor.Demo.csproj
+```
+
 ## Blog usage
 
 ```razor
@@ -242,6 +250,8 @@ Deliberately left OUT of this unification: `SessionControl`'s `.active-badge` an
 ```
 
 `KSidebarNav` is the collapsible win98-style sidebar shell — brand row with a collapse toggle (desktop) and a hamburger toggle (mobile, closes on nav click), plus the `<NavLink>` list itself with active/hover states. It replaced `GazeLab.Web`'s `NavMenu.razor`, which was 100% chrome (the CSS) hard-coded around one specific list of 9 routes — the chrome is the reusable part, so it moved here; the route list stays app-owned, passed in as `IReadOnlyList<KNavItem>` (`Href`, `Label`, `Icon`, `MatchAll` for the home/root link). `IsCollapsed`/`IsCollapsedChanged` bind the desktop collapse state (owned by the host layout, since it also affects the host's own `.sidebar` width — see `MainLayout.razor.css`'s `.sidebar.is-collapsed { width: 88px; }`); the mobile hamburger state is internal, matching the original. This is the first component here with a routing dependency (`Microsoft.AspNetCore.Components.Routing` for `NavLink`/`NavLinkMatch`) — every other component in this library is routing-agnostic.
+
+`KNavItem.Icon` is `KIconName?` (optional) — `GazeLab.Web`'s own nav always has one, but `KIconName` is otherwise just the icon set extracted from `GazeLab.Web`'s specific pages/actions, so a project with a different set of nav sections has nothing generic to point at yet. Omit `Icon` and the item renders text-only, including in the collapsed desktop state (where icon-bearing items normally collapse to icon-only) — see this library's own `demo/35p10.Blazor.Demo`, whose nav is entirely icon-less.
 
 Deliberately NOT included: the surrounding page shell (`MainLayout.razor`'s `.page`/`.sidebar`/`main` grid, sticky positioning, the player-route upload bar). That's a separate, deeper layer — `KSidebarNav` is just what goes *inside* the sidebar slot a host layout provides.
 
