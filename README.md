@@ -151,6 +151,18 @@ All four share the same `field-input` look (padding, border, radius, background,
 
 Two icon families exist in `KIconName`: the action-icon set (`Plus`, `Refresh`, `ImageAdd`, `Trash`, `ChevronUp`, `ChevronDown`, `ChevronLeft`, `ChevronRight`, `Save`, `Aoi`, `Edit`, `Close`) migrated from `UiIcon`, and the `Nav*`-prefixed set (`NavHome`, `NavChartGaze`, `NavSessionControl`, `NavTrials`, `NavSessions`, `NavLiveGaze`, `NavPlayer`, `NavStreetView`, `NavSegmentation`) migrated from `NavMenu.razor`'s inline `<svg>` sidebar icons. `ChevronLeft`/`ChevronRight` were added alongside the other two to round out a full 4-direction chevron set, replacing `NavMenu.razor`'s `"«"`/`"»"` text-glyph sidebar-collapse toggle.
 
+## Inline meta separator
+
+```razor
+<KText Variant="KTextVariant.Muted">
+    @Session.TrialIds.Count trial(s)
+    <KMetaSeparator />
+    @Session.Images.Count image(s)
+</KText>
+```
+
+`KMetaSeparator` is the smallest component here: a single `<span class="meta-sep">·</span>` with `margin: 0 0.2rem; color: #888;`. It existed as hand-written, byte-identical markup AND CSS in 6 different files (10 call sites) — every "chip · chip · chip" meta line in the app (session facts, image dimensions, sample counts, ...) built its separators this way. `Symbol` overrides the character (default `"·"`) for projects that want a different divider (`"•"`, `"|"`, ...).
+
 ## Badges
 
 ```razor
