@@ -1,0 +1,106 @@
+@page "/data"
+
+<PageTitle>35p10.Blazor Demo - Data</PageTitle>
+
+<KText Variant="KTextVariant.Title">Data</KText>
+<KText Variant="KTextVariant.Lead">Tables, stat lists, images, and icons.</KText>
+
+<DemoSection Title="KTable" Code="@TableSnippet">
+    <Description>A thin wrapper around a native <code>&lt;table&gt;</code> &mdash; you still write <code>&lt;thead&gt;</code>/<code>&lt;tbody&gt;</code>/<code>&lt;tr&gt;</code> yourself.</Description>
+    <Example>
+        <KTable>
+            <thead>
+                <tr><th>Name</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Samples</td><td>128</td></tr>
+                <tr><td>Trials</td><td>4</td></tr>
+            </tbody>
+        </KTable>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KStatList" Code="@StatListSnippet">
+    <Description>Three variants found across the app: <code>Inline</code> (label column beside the value), <code>Stacked</code> (small uppercase label above the value), and <code>Grid</code> (each pair its own tile).</Description>
+    <Example>
+        <KStatList>
+            <div><dt>Pano</dt><dd>gm_0</dd></div>
+            <div><dt>Size</dt><dd>4096 x 2048</dd></div>
+        </KStatList>
+        <KStatList Variant="KStatListVariant.Grid">
+            <div><dt>Time</dt><dd>1.2s</dd></div>
+            <div><dt>Valid</dt><dd>true</dd></div>
+        </KStatList>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KImage" Code="@ImageSnippet">
+    <Description>Frames an <code>&lt;img&gt;</code> (rounded border, <code>overflow: hidden</code>, <code>object-fit: cover</code>) with an optional overlay badge via <code>ChildContent</code>.</Description>
+    <Example>
+        <KImage Src="https://picsum.photos/seed/35p10/320/160" Alt="Sample" />
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KIcon" Code="@IconSnippet">
+    <Description>Compile-time-safe <code>KIconName</code> enum instead of a string lookup. <code>Size</code> is a plain CSS length (default <code>1rem</code>).</Description>
+    <Example>
+        <KIcon Name="KIconName.Refresh" />
+        <KIcon Name="KIconName.Trash" Size="1.25rem" />
+        <KIcon Name="KIconName.Save" Size="1.5rem" />
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KMetaSeparator" Code="@MetaSeparatorSnippet">
+    <Description>The smallest component here: a single <code>&lt;span&gt;</code> for the "chip &middot; chip &middot; chip" pattern.</Description>
+    <Example>
+        <KText Variant="KTextVariant.Muted">
+            4 trial(s)
+            <KMetaSeparator />
+            128 image(s)
+        </KText>
+    </Example>
+</DemoSection>
+
+@code {
+    private const string TableSnippet =
+        """
+        <KTable MaxHeight="600px">
+            <thead>
+                <tr><th>Name</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Rows)
+                {
+                    <tr class="@(row.IsCurrent ? "table-row-active" : "table-row-clickable")" @onclick="() => Select(row)">
+                        <td>@row.Name</td>
+                        <td>@row.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </KTable>
+        """;
+
+    private const string StatListSnippet =
+        """
+        <KStatList>
+            <div><dt>Pano</dt><dd>@LastMetadata.PanoId</dd></div>
+        </KStatList>
+
+        <KStatList Variant="KStatListVariant.Grid">
+            <div><dt>Time</dt><dd>@FormatNumber(CurrentSample.T)s</dd></div>
+        </KStatList>
+        """;
+
+    private const string ImageSnippet = """<KImage Src="@Api.GetImageUrl(Session.Id, image.Id)" Alt="@GetImageName(image)" />""";
+
+    private const string IconSnippet = """<KIcon Name="KIconName.Refresh" Size="1.25rem" />""";
+
+    private const string MetaSeparatorSnippet =
+        """
+        <KText Variant="KTextVariant.Muted">
+            @Session.TrialIds.Count trial(s)
+            <KMetaSeparator />
+            @Session.Images.Count image(s)
+        </KText>
+        """;
+}

@@ -1,0 +1,70 @@
+@page "/layout"
+
+<PageTitle>35p10.Blazor Demo - Layout</PageTitle>
+
+<KText Variant="KTextVariant.Title">Layout</KText>
+<KText Variant="KTextVariant.Lead">Structural chrome: cards, section headers, and the sidebar nav this demo itself uses.</KText>
+
+<DemoSection Title="KCard" Code="@CardSnippet">
+    <Description>A bordered, padded surface. Pass <code>Href</code> to render it as a link instead of a <code>div</code>.</Description>
+    <Example>
+        <KText Variant="KTextVariant.Body">Plain card content.</KText>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KSectionHeader" Code="@SectionHeaderSnippet">
+    <Description>A title-left, actions-right flex row that stacks below 640px. When both sides are used, wrap the title side in an explicit <code>&lt;ChildContent&gt;</code> tag &mdash; Razor rejects mixing bare child content with a named <code>&lt;Actions&gt;</code> tag.</Description>
+    <Example>
+        <KSectionHeader>
+            <ChildContent>
+                <KText Variant="KTextVariant.Subtitle">Trials</KText>
+            </ChildContent>
+            <Actions>
+                <KButton>Refresh</KButton>
+            </Actions>
+        </KSectionHeader>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KSidebarNav" Code="@SidebarNavSnippet">
+    <Description>The collapsible sidebar shell you're looking at right now &mdash; brand row, collapse toggle, and the <code>NavLink</code> list. <code>Icon</code> on <code>KNavItem</code> is optional; this demo's own nav omits it.</Description>
+</DemoSection>
+
+@code {
+    private const string CardSnippet =
+        """
+        <KCard>
+            <KText Variant="KTextVariant.Body">Plain card content.</KText>
+        </KCard>
+
+        <KCard Href="trials">Click-through card.</KCard>
+        """;
+
+    private const string SectionHeaderSnippet =
+        """
+        <KSectionHeader>
+            <ChildContent>
+                <KText Variant="KTextVariant.Subtitle">Trials</KText>
+            </ChildContent>
+            <Actions>
+                <KButton>Refresh</KButton>
+            </Actions>
+        </KSectionHeader>
+        """;
+
+    private const string SidebarNavSnippet =
+        """
+        <KSidebarNav BrandText="My App"
+                     Items="NavItems"
+                     IsCollapsed="isSidebarCollapsed"
+                     IsCollapsedChanged="@(collapsed => isSidebarCollapsed = collapsed)" />
+
+        @code {
+            private static readonly IReadOnlyList<KNavItem> NavItems = new List<KNavItem>
+            {
+                new("", "Home", KIconName.NavHome, MatchAll: true),
+                new("settings", "Settings"), // Icon is optional
+            };
+        }
+        """;
+}

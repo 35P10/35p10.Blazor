@@ -1,0 +1,114 @@
+@page "/forms"
+
+<PageTitle>35p10.Blazor Demo - Forms</PageTitle>
+
+<KText Variant="KTextVariant.Title">Forms</KText>
+<KText Variant="KTextVariant.Lead">Bindable wrapper components (<code>Value</code>/<code>ValueChanged</code>, so <code>@@bind-Value</code> works) &mdash; no <code>EditForm</code>/<code>EditContext</code> required.</KText>
+
+<DemoSection Title="KTextInput" Code="@TextInputSnippet">
+    <Description>Wraps <code>&lt;input&gt;</code>; <code>Type</code> defaults to <code>&quot;text&quot;</code>.</Description>
+    <Example>
+        <KTextInput @bind-Value="textValue" Placeholder="Session name" MaxLength="100" />
+        <KText Variant="KTextVariant.Muted">Value: @textValue</KText>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KNumberInput&lt;TValue&gt;" Code="@NumberInputSnippet">
+    <Description>Generic over any numeric <code>struct</code> implementing <code>IParsable&lt;TValue&gt;</code>. <code>Value</code> is nullable &mdash; wire it manually for non-nullable bound properties.</Description>
+    <Example>
+        <KNumberInput TValue="double" @bind-Value="numberValue" Step="any" />
+        <KText Variant="KTextVariant.Muted">Value: @numberValue</KText>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KSelect&lt;TValue&gt;" Code="@SelectSnippet">
+    <Description>Wraps <code>&lt;select&gt;</code>; pass <code>&lt;option&gt;</code> elements as <code>ChildContent</code> exactly as you would natively.</Description>
+    <Example>
+        <KSelect @bind-Value="selectValue">
+            <option value="a">Option A</option>
+            <option value="b">Option B</option>
+        </KSelect>
+        <KText Variant="KTextVariant.Muted">Value: @selectValue</KText>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KTextArea" Code="@TextAreaSnippet">
+    <Description><code>resize: vertical</code> by default, plus an optional <code>Monospace</code> flag.</Description>
+    <Example>
+        <KTextArea @bind-Value="textAreaValue" rows="3" />
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KCheckbox" Code="@CheckboxSnippet">
+    <Description>A <code>&lt;label&gt;</code> wrapping <code>&lt;input type=&quot;checkbox&quot;&gt;</code>; bindable via <code>Value</code> (<code>bool</code>).</Description>
+    <Example>
+        <KCheckbox @bind-Value="checkboxValue">Export panorama</KCheckbox>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KRange&lt;TValue&gt;" Code="@RangeSnippet">
+    <Description>Generic over any <code>struct</code> implementing <code>IParsable&lt;TValue&gt;</code>/<code>IFormattable</code>.</Description>
+    <Example>
+        <KRange TValue="double" Min="0" Max="1" Step="0.1" @bind-Value="rangeValue">Level</KRange>
+        <KText Variant="KTextVariant.Muted">Value: @rangeValue</KText>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KFileUpload" Code="@FileUploadSnippet">
+    <Description>Wraps Microsoft's built-in <code>&lt;InputFile&gt;</code>, visually hidden and stretched over the label.</Description>
+    <Example>
+        <KFileUpload OnChange="HandleFileChange" Accept="image/*">
+            <KIcon Name="KIconName.ImageAdd" />
+            <span>Choose image</span>
+        </KFileUpload>
+    </Example>
+</DemoSection>
+
+@code {
+    private string textValue = "";
+    private double? numberValue = 1.6;
+    private string selectValue = "a";
+    private string textAreaValue = "";
+    private bool checkboxValue;
+    private double rangeValue = 0.5;
+
+    private void HandleFileChange(InputFileChangeEventArgs args)
+    {
+    }
+
+    private const string TextInputSnippet = """<KTextInput @bind-Value="SessionName" Placeholder="Session name" MaxLength="100" />""";
+
+    private const string NumberInputSnippet =
+        """
+        <KNumberInput TValue="double" @bind-Value="Latitude" Step="any" />
+
+        <!-- non-nullable bound property: wire it manually -->
+        <KNumberInput TValue="int" Value="@CubemapFaceSize"
+                      ValueChanged="@((int? v) => CubemapFaceSize = v ?? CubemapFaceSize)" />
+        """;
+
+    private const string SelectSnippet =
+        """
+        <KSelect @bind-Value="TrialToAssignId">
+            <option value="">Add trial</option>
+            @foreach (var trial in AvailableTrials)
+            {
+                <option value="@trial.Id">@trial.Name</option>
+            }
+        </KSelect>
+        """;
+
+    private const string TextAreaSnippet = """<KTextArea @bind-Value="Notes" MaxLength="2000" />""";
+
+    private const string CheckboxSnippet = """<KCheckbox @bind-Value="ExportPanorama">Panorama</KCheckbox>""";
+
+    private const string RangeSnippet = """<KRange TValue="double" Min="0.5" Max="3" Step="0.1" @bind-Value="HeatmapLevel">Level</KRange>""";
+
+    private const string FileUploadSnippet =
+        """
+        <KFileUpload Disabled="IsBusy" OnChange="OnFileSelectedAsync" Accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+            <KIcon Name="KIconName.ImageAdd" />
+            <span>Choose image</span>
+        </KFileUpload>
+        """;
+}

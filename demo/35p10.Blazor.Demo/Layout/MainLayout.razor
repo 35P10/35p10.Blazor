@@ -1,3 +1,32 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
-@Body
+<div class="page">
+    <div class="sidebar @(isSidebarCollapsed ? "is-collapsed" : string.Empty)">
+        <KSidebarNav BrandText="35p10.Blazor"
+                     Items="NavItems"
+                     IsCollapsed="isSidebarCollapsed"
+                     IsCollapsedChanged="@(collapsed => isSidebarCollapsed = collapsed)" />
+    </div>
+
+    <main>
+        <article class="content">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private bool isSidebarCollapsed;
+
+    private static readonly IReadOnlyList<KNavItem> NavItems = new List<KNavItem>
+    {
+        new("", "Overview", MatchAll: true),
+        new("layout", "Layout"),
+        new("typography", "Typography"),
+        new("actions", "Actions"),
+        new("forms", "Forms"),
+        new("feedback", "Feedback"),
+        new("data", "Data"),
+        new("blog", "Blog"),
+    };
+}

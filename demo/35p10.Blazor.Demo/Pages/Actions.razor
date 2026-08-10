@@ -1,0 +1,51 @@
+@page "/actions"
+
+<PageTitle>35p10.Blazor Demo - Actions</PageTitle>
+
+<KText Variant="KTextVariant.Title">Actions</KText>
+<KText Variant="KTextVariant.Lead">A single button component covering every button look found across the app.</KText>
+
+<DemoSection Title="Variants" Code="@VariantSnippet">
+    <Description><code>Default</code>, <code>Primary</code>, and <code>Danger</code> cover most buttons; <code>Choice</code> is for tab-like or chip-like selectable buttons (pair with <code>Active</code>).</Description>
+    <Example>
+        <KButton>Default</KButton>
+        <KButton Variant="KButtonVariant.Primary">Primary</KButton>
+        <KButton Variant="KButtonVariant.Danger">Danger</KButton>
+        <KButton Variant="KButtonVariant.Choice">Choice</KButton>
+        <KButton Variant="KButtonVariant.Choice" Active="true">Choice (active)</KButton>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="Icon-only and links" Code="@IconAndLinkSnippet">
+    <Description><code>IconOnly</code> tightens the padding for a square icon button. Set <code>Href</code> to render an <code>&lt;a&gt;</code> instead of a <code>&lt;button&gt;</code>.</Description>
+    <Example>
+        <KButton IconOnly="true" title="Refresh" aria-label="Refresh">
+            <KIcon Name="KIconName.Refresh" />
+        </KButton>
+        <KButton Href="#">Link button</KButton>
+        <KButton Disabled="true">Disabled</KButton>
+    </Example>
+</DemoSection>
+
+@code {
+    private const string VariantSnippet =
+        """
+        <KButton>Default</KButton>
+        <KButton Variant="KButtonVariant.Primary">Primary</KButton>
+        <KButton Variant="KButtonVariant.Danger">Danger</KButton>
+        <KButton Variant="KButtonVariant.Choice" Active="@(SelectedId == item.Id)"
+                 OnClick="() => Select(item.Id)">
+            @item.Label
+        </KButton>
+        """;
+
+    private const string IconAndLinkSnippet =
+        """
+        <KButton IconOnly="true" title="Refresh" aria-label="Refresh" OnClick="RefreshAsync">
+            <KIcon Name="KIconName.Refresh" />
+        </KButton>
+
+        <KButton Href="trials">Go to Trials</KButton>
+        <KButton Disabled="@IsBusy">Disabled while busy</KButton>
+        """;
+}

@@ -1,0 +1,17 @@
+<KText Variant="KTextVariant.Subtitle" Tag="h2">@Title</KText>
+@if (Description is not null)
+{
+    <KText Variant="KTextVariant.Muted">@Description</KText>
+}
+@if (Example is not null)
+{
+    <KCard Class="demo-swatch">@Example</KCard>
+}
+<KBlogCode Code="@Code" />
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? Description { get; set; }
+    [Parameter] public RenderFragment? Example { get; set; }
+    [Parameter, EditorRequired] public string Code { get; set; } = string.Empty;
+}

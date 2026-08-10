@@ -1,0 +1,64 @@
+@page "/typography"
+
+<PageTitle>35p10.Blazor Demo - Typography</PageTitle>
+
+<KText Variant="KTextVariant.Title">Typography</KText>
+<KText Variant="KTextVariant.Lead">One component, ten variants, an optional color override. Each variant renders a sensible default HTML tag, overridable with <code>Tag</code>.</KText>
+
+<DemoSection Title="Dashboard scale" Code="@DashboardSnippet">
+    <Description>The app-chrome scale: page titles, panel subtitles, body copy, captions, muted meta text.</Description>
+    <Example>
+        <KText Variant="KTextVariant.Title">Title</KText>
+        <KText Variant="KTextVariant.Subtitle">Subtitle</KText>
+        <KText Variant="KTextVariant.Body">Body - the default variant.</KText>
+        <KText Variant="KTextVariant.Lead">Lead - a slightly larger intro paragraph.</KText>
+        <KText Variant="KTextVariant.Caption">Caption - uppercase, small</KText>
+        <KText Variant="KTextVariant.Muted">Muted - de-emphasized meta text.</KText>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="Blog scale" Code="@BlogSnippet">
+    <Description>Prefixed <code>Blog*</code> so they're never confused with the dashboard scale &mdash; used internally by <code>KBlogHeader</code>/<code>KBlogSection</code>. See the <a href="blog">Blog</a> page for these in context.</Description>
+    <Example>
+        <KText Variant="KTextVariant.BlogDisplay">BlogDisplay</KText>
+        <KText Variant="KTextVariant.BlogByline">BlogByline</KText>
+        <KText Variant="KTextVariant.BlogIntro">BlogIntro - a larger lead for article openings.</KText>
+        <KText Variant="KTextVariant.BlogSectionHeading">BlogSectionHeading</KText>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="Color override" Code="@ColorSnippet">
+    <Description>Independent of variant size/weight. Reuses the same status colors as <code>KBadge</code>.</Description>
+    <Example>
+        <KText Variant="KTextVariant.Body" Color="KColor.Muted">Muted</KText>
+        <KText Variant="KTextVariant.Body" Color="KColor.Primary">Primary</KText>
+        <KText Variant="KTextVariant.Body" Color="KColor.Danger">Danger</KText>
+        <KText Variant="KTextVariant.Body" Color="KColor.Success">Success</KText>
+        <KText Variant="KTextVariant.Body" Color="KColor.Warning">Warning</KText>
+    </Example>
+</DemoSection>
+
+@code {
+    private const string DashboardSnippet =
+        """
+        <KText Variant="KTextVariant.Title">Title</KText>
+        <KText Variant="KTextVariant.Subtitle">Subtitle</KText>
+        <KText Variant="KTextVariant.Body">Body text.</KText>
+        <KText Variant="KTextVariant.Lead">Lead paragraph.</KText>
+        <KText Variant="KTextVariant.Caption">Caption</KText>
+        <KText Variant="KTextVariant.Muted">Muted meta text.</KText>
+        """;
+
+    private const string BlogSnippet =
+        """
+        <KText Variant="KTextVariant.BlogDisplay">Article title</KText>
+        <KText Variant="KTextVariant.BlogByline">2026-08-10</KText>
+        <KText Variant="KTextVariant.BlogIntro">A larger opening paragraph.</KText>
+        <KText Variant="KTextVariant.BlogSectionHeading">Section</KText>
+        """;
+
+    private const string ColorSnippet =
+        """
+        <KText Variant="KTextVariant.Title" Color="KColor.Danger">Failed</KText>
+        """;
+}

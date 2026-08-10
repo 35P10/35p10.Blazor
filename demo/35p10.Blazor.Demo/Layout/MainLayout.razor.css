@@ -1,0 +1,42 @@
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--win98-bg, #e7e7e7);
+}
+
+main {
+    flex: 1;
+}
+
+.sidebar {
+    background: var(--win98-surface, #f4f4f4);
+    border-right: 1px solid var(--ui-border, #c6c6c6);
+    transition: width 180ms ease;
+}
+
+.content {
+    display: grid;
+    gap: 1.75rem;
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+}
+
+@media (min-width: 641px) {
+    .page {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    .sidebar.is-collapsed {
+        width: 88px;
+    }
+}

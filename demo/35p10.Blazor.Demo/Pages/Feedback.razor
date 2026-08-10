@@ -1,0 +1,106 @@
+@page "/feedback"
+
+<PageTitle>35p10.Blazor Demo - Feedback</PageTitle>
+
+<KText Variant="KTextVariant.Title">Feedback</KText>
+<KText Variant="KTextVariant.Lead">Status, loading, and empty-state components.</KText>
+
+<DemoSection Title="KBadge" Code="@BadgeSnippet">
+    <Description>Reuses <code>KColor</code> so every status pill shares exactly one green, one red, one amber. <code>Rounded="false"</code> switches to a more rectangular badge shape.</Description>
+    <Example>
+        <KBadge>Idle</KBadge>
+        <KBadge Color="KColor.Success">Connected</KBadge>
+        <KBadge Color="KColor.Danger" Rounded="false">Failed</KBadge>
+        <KBadge Color="KColor.Success" Dot="true">Live</KBadge>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KSpinner" Code="@SpinnerSnippet">
+    <Description>A single rotating-border indicator. Compose it with your own text/<code>KCard</code> wrapper &mdash; it doesn't bundle a label.</Description>
+    <Example>
+        <KSpinner />
+        <span>Loading session...</span>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KDialog" Code="@DialogSnippet">
+    <Description>Backdrop + centered window modal. <code>@@bind-IsOpen</code> controls visibility.</Description>
+    <Example>
+        <KButton OnClick="@(() => isDialogOpen = true)">Open dialog</KButton>
+        <KDialog @bind-IsOpen="isDialogOpen" Title="Example dialog">
+            <KText Variant="KTextVariant.Body">Dialog body content.</KText>
+        </KDialog>
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KToastStack" Code="@ToastSnippet">
+    <Description>Purely presentational &mdash; renders a fixed top-right stack from an <code>IReadOnlyList&lt;KToastItem&gt;</code>. Scheduling/auto-dismiss timing is owned by your own app-level toast service.</Description>
+    <Example>
+        <KButton OnClick="ShowToast">Show a toast</KButton>
+        <KToastStack Toasts="@toasts" OnDismiss="DismissToast" />
+    </Example>
+</DemoSection>
+
+<DemoSection Title="KEmptyState" Code="@EmptyStateSnippet">
+    <Description>A thin <code>KCard</code> wrapper (centered, muted text by default) for "loading..."/"no data" placeholders.</Description>
+    <Example>
+        <KEmptyState>No trials.</KEmptyState>
+    </Example>
+</DemoSection>
+
+@code {
+    private bool isDialogOpen;
+    private readonly List<KToastItem> toasts = [];
+
+    private void ShowToast()
+    {
+        toasts.Add(new KToastItem(Guid.NewGuid(), "Session saved.", KColor.Primary, TimeSpan.FromSeconds(3.5)));
+    }
+
+    private void DismissToast(Guid id)
+    {
+        toasts.RemoveAll(t => t.Id == id);
+    }
+
+    private const string BadgeSnippet =
+        """
+        <KBadge>Idle</KBadge>
+        <KBadge Color="KColor.Success">Connected</KBadge>
+        <KBadge Color="KColor.Danger" Rounded="false">Failed</KBadge>
+        <KBadge Color="KColor.Success" Dot="true">Live</KBadge>
+        """;
+
+    private const string SpinnerSnippet = """<KSpinner />""";
+
+    private const string DialogSnippet =
+        """
+        <KDialog @bind-IsOpen="ShowDialog" Title="@($"{Trial.Id} · {Image.Id}")">
+            <p>Dialog body content.</p>
+        </KDialog>
+        """;
+
+    private const string ToastSnippet =
+        """
+        @inject ToastService ToastService
+        @implements IDisposable
+
+        <KToastStack Toasts="@Items" OnDismiss="@(id => ToastService.Dismiss(id))" />
+
+        @code {
+            IReadOnlyList<KToastItem> Items => ToastService.Toasts
+                .Select(t => new KToastItem(t.Id, t.Message,
+                    t.Kind == ToastKind.Error ? KColor.Danger : KColor.Primary, t.Duration))
+                .ToList();
+        }
+        """;
+
+    private const string EmptyStateSnippet =
+        """
+        <KEmptyState>No trials.</KEmptyState>
+
+        <KEmptyState>
+            <KText Variant="KTextVariant.Body">Image not found.</KText>
+            <KButton Href="trials">Back</KButton>
+        </KEmptyState>
+        """;
+}

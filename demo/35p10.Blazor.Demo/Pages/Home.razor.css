@@ -1,0 +1,22 @@
+.category-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+::deep .category-entry {
+    display: grid;
+    gap: 0.25rem;
+}
+
+::deep .category-entry:hover strong {
+    color: var(--win98-blue-strong, #1277a7);
+}
+
+.category-entry strong {
+    font-size: 1rem;
+    line-height: 1.3;
+}
