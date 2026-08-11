@@ -98,6 +98,14 @@ An optional `Color` parameter (`KColor`) overrides the variant's default color i
 
 Each `KColor` member maps directly to its `var(--win98-...)` expression via the `ToVar()` extension method (`KColor.Danger.ToVar()` → `"var(--win98-danger, #8f3a3a)"`), so a component just does `style="color: @Color.Value.ToVar()"` — no intermediate CSS class or lookup table to keep in sync.
 
+### KCode
+
+```razor
+<KText Variant="KTextVariant.Body">Pass <KCode>Href</KCode> to render <KCode>KCard</KCode> as a link.</KText>
+```
+
+An inline `<code>` wrapper — a small bordered/shaded chip. It replaces a bare global `code { border; border-radius; background; }` rule that used to live in `base.css`: every un-componentized `<code>` tag anywhere in a consuming app got that box "for free," which is exactly the kind of implicit, undocumented styling this library otherwise avoids (see `KSidebarNav`'s note on not leaning on Bootstrap). `base.css` now only styles bare `<pre>` — there's no `KPre`/block-code component outside `KBlogCode`, since block code so far has only shown up inside blog articles.
+
 ## Form inputs
 
 ```razor
@@ -253,7 +261,33 @@ Deliberately left OUT of this unification: `SessionControl`'s `.active-badge` an
 
 `KNavItem.Icon` is `KIconName?` (optional) — `GazeLab.Web`'s own nav always has one, but `KIconName` is otherwise just the icon set extracted from `GazeLab.Web`'s specific pages/actions, so a project with a different set of nav sections has nothing generic to point at yet. Omit `Icon` and the item renders text-only, including in the collapsed desktop state (where icon-bearing items normally collapse to icon-only) — see this library's own `demo/35p10.Blazor.Demo`, whose nav is entirely icon-less.
 
-Deliberately NOT included: the surrounding page shell (`MainLayout.razor`'s `.page`/`.sidebar`/`main` grid, sticky positioning, the player-route upload bar). That's a separate, deeper layer — `KSidebarNav` is just what goes *inside* the sidebar slot a host layout provides.
+`KSidebarNav` is just what goes *inside* the sidebar slot — see `KAppShell` below for the surrounding page grid.
+
+## App shell
+
+```razor
+@inherits LayoutComponentBase
+
+<KAppShell SidebarCollapsed="isSidebarCollapsed" ShowToolbar="IsPlayerRoute">
+    <Sidebar>
+        <KSidebarNav BrandText="My App" Items="NavItems" IsCollapsed="isSidebarCollapsed"
+                     IsCollapsedChanged="@(c => isSidebarCollapsed = c)" />
+    </Sidebar>
+    <Toolbar>
+        <label class="top-row-upload">
+            <span>Load Session</span>
+            <InputFile OnChange="HandleSessionFileChange" accept=".json,application/json" />
+        </label>
+    </Toolbar>
+    <ChildContent>
+        @Body
+    </ChildContent>
+</KAppShell>
+```
+
+`KAppShell` is the `.page`/`.sidebar`/`main`/`article` grid that used to be hand-copied inside `GazeLab.Web`'s `MainLayout.razor.css` — proven duplicated the moment this library's own demo needed the exact same shell and I had to paste the same CSS a second time. Three `RenderFragment` slots: `Sidebar` (optional — omit it for a nav-less layout), `Toolbar` (optional, a sticky bar above the content — `GazeLab.Web` uses it only on the player route), and `ChildContent` (`@Body`). As with `KSectionHeader`, when more than one slot is used they all need explicit tags (`<Sidebar>`/`<Toolbar>`/`<ChildContent>`), and a slot's visibility must be controlled from *inside* the tag or via a parameter — never by wrapping the `<Toolbar>`/`<Sidebar>` tag itself in `@if`, which Razor rejects (see `ShowToolbar`, added specifically because `GazeLab.Web` needs the toolbar's `RenderFragment` content to exist unconditionally but only be *displayed* on one route).
+
+Padding/`max-width`/background for `.app-shell-content` are deliberately NOT baked in (same reasoning as `KSectionHeader`'s margins) — `GazeLab.Web` wants an edge-to-edge dashboard column, the demo wants a centered `56rem` reading column with a `gap`; both set it themselves with `::deep .app-shell-content { ... }`.
 
 ## Empty states
 

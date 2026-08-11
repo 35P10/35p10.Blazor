@@ -6,7 +6,7 @@
 <KText Variant="KTextVariant.Lead">Status, loading, and empty-state components.</KText>
 
 <DemoSection Title="KBadge" Code="@BadgeSnippet">
-    <Description>Reuses <code>KColor</code> so every status pill shares exactly one green, one red, one amber. <code>Rounded="false"</code> switches to a more rectangular badge shape.</Description>
+    <Description>Reuses <KCode>KColor</KCode> so every status pill shares exactly one green, one red, one amber. <KCode>Rounded="false"</KCode> switches to a more rectangular badge shape.</Description>
     <Example>
         <KBadge>Idle</KBadge>
         <KBadge Color="KColor.Success">Connected</KBadge>
@@ -16,7 +16,7 @@
 </DemoSection>
 
 <DemoSection Title="KSpinner" Code="@SpinnerSnippet">
-    <Description>A single rotating-border indicator. Compose it with your own text/<code>KCard</code> wrapper &mdash; it doesn't bundle a label.</Description>
+    <Description>A single rotating-border indicator. Compose it with your own text/<KCode>KCard</KCode> wrapper &mdash; it doesn't bundle a label.</Description>
     <Example>
         <KSpinner />
         <span>Loading session...</span>
@@ -24,7 +24,7 @@
 </DemoSection>
 
 <DemoSection Title="KDialog" Code="@DialogSnippet">
-    <Description>Backdrop + centered window modal. <code>@@bind-IsOpen</code> controls visibility.</Description>
+    <Description>Backdrop + centered window modal. <KCode>@@bind-IsOpen</KCode> controls visibility.</Description>
     <Example>
         <KButton OnClick="@(() => isDialogOpen = true)">Open dialog</KButton>
         <KDialog @bind-IsOpen="isDialogOpen" Title="Example dialog">
@@ -34,7 +34,7 @@
 </DemoSection>
 
 <DemoSection Title="KToastStack" Code="@ToastSnippet">
-    <Description>Purely presentational &mdash; renders a fixed top-right stack from an <code>IReadOnlyList&lt;KToastItem&gt;</code>. Scheduling/auto-dismiss timing is owned by your own app-level toast service.</Description>
+    <Description>Purely presentational &mdash; renders a fixed top-right stack from an <KCode>IReadOnlyList&lt;KToastItem&gt;</KCode>. Scheduling/auto-dismiss timing is owned by your own app-level toast service.</Description>
     <Example>
         <KButton OnClick="ShowToast">Show a toast</KButton>
         <KToastStack Toasts="@toasts" OnDismiss="DismissToast" />
@@ -42,7 +42,7 @@
 </DemoSection>
 
 <DemoSection Title="KEmptyState" Code="@EmptyStateSnippet">
-    <Description>A thin <code>KCard</code> wrapper (centered, muted text by default) for "loading..."/"no data" placeholders.</Description>
+    <Description>A thin <KCode>KCard</KCode> wrapper (centered, muted text by default) for "loading..."/"no data" placeholders.</Description>
     <Example>
         <KEmptyState>No trials.</KEmptyState>
     </Example>

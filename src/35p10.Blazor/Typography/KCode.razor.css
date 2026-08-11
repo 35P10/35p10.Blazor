@@ -1,0 +1,7 @@
+.inline-code {
+    padding: 0.1em 0.4em;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 6px;
+    background: var(--win98-surface-soft, #ededed);
+    font-size: 0.85em;
+}

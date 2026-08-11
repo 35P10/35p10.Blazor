@@ -1,18 +1,17 @@
 @inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar @(isSidebarCollapsed ? "is-collapsed" : string.Empty)">
-        <KSidebarNav BrandText="35p10.Blazor"
-                     Items="NavItems"
-                     IsCollapsed="isSidebarCollapsed"
-                     IsCollapsedChanged="@(collapsed => isSidebarCollapsed = collapsed)" />
-    </div>
-
-    <main>
-        <article class="content">
+<div class="main-layout">
+    <KAppShell SidebarCollapsed="isSidebarCollapsed">
+        <Sidebar>
+            <KSidebarNav BrandText="35p10.Blazor"
+                         Items="NavItems"
+                         IsCollapsed="isSidebarCollapsed"
+                         IsCollapsedChanged="@(collapsed => isSidebarCollapsed = collapsed)" />
+        </Sidebar>
+        <ChildContent>
             @Body
-        </article>
-    </main>
+        </ChildContent>
+    </KAppShell>
 </div>
 
 @code {

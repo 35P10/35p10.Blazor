@@ -9,7 +9,7 @@ a {
     color: var(--win98-blue-strong, #1277a7);
 }
 
-code, pre {
+pre {
     border: 1px solid var(--ui-border, #c6c6c6);
     border-radius: 10px;
     background: #fff;

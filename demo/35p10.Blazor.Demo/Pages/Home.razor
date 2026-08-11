@@ -7,18 +7,18 @@
 <KText Variant="KTextVariant.Title" Tag="h2">Getting started</KText>
 
 <DemoSection Title="1. Reference the package" Code="@ReferenceSnippet">
-    <Description>As a NuGet package, or as a project reference if you're consuming it from source (e.g. a git submodule, the way <code>GazeLab.Web</code> does).</Description>
+    <Description>As a NuGet package, or as a project reference if you're consuming it from source (e.g. a git submodule, the way <KCode>GazeLab.Web</KCode> does).</Description>
 </DemoSection>
 
 <DemoSection Title="2. Import the namespace" Code="@ImportSnippet">
-    <Description>Add it once to <code>_Imports.razor</code> so every page can use the components without a per-file <code>@@using</code>.</Description>
+    <Description>Add it once to <KCode>_Imports.razor</KCode> so every page can use the components without a per-file <KCode>@@using</KCode>.</Description>
 </DemoSection>
 
 <DemoSection Title="3. Add the stylesheets" Code="@StylesheetSnippet">
     <Description>
-        Two stylesheets ship as static web assets under <code>_content/35p10.Blazor/</code>: <code>theme.css</code> (the
-        <code>--win98-*</code>/<code>--ui-border*</code> color tokens every component reads) and <code>base.css</code> (base
-        typography, link color, and the boxed look for bare <code>&lt;code&gt;</code>/<code>&lt;pre&gt;</code>). Link both
+        Two stylesheets ship as static web assets under <KCode>_content/35p10.Blazor/</KCode>: <KCode>theme.css</KCode> (the
+        <KCode>--win98-*</KCode>/<KCode>--ui-border*</KCode> color tokens every component reads) and <KCode>base.css</KCode> (base
+        typography, link color, and the boxed look for bare <KCode>&lt;code&gt;</KCode>/<KCode>&lt;pre&gt;</KCode>). Link both
         <em>before</em> your app's own stylesheet, so your app can still override anything it needs to.
         Don't add your own copy of Bootstrap or another CSS framework and expect these components to lean on it for layout —
         every component here is self-contained; if something looks unstyled, it's a missing link tag, not a missing dependency.

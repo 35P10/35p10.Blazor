@@ -3,7 +3,7 @@
 <PageTitle>35p10.Blazor Demo - Typography</PageTitle>
 
 <KText Variant="KTextVariant.Title">Typography</KText>
-<KText Variant="KTextVariant.Lead">One component, ten variants, an optional color override. Each variant renders a sensible default HTML tag, overridable with <code>Tag</code>.</KText>
+<KText Variant="KTextVariant.Lead">One component, ten variants, an optional color override. Each variant renders a sensible default HTML tag, overridable with <KCode>Tag</KCode>.</KText>
 
 <DemoSection Title="Dashboard scale" Code="@DashboardSnippet">
     <Description>The app-chrome scale: page titles, panel subtitles, body copy, captions, muted meta text.</Description>
@@ -18,7 +18,7 @@
 </DemoSection>
 
 <DemoSection Title="Blog scale" Code="@BlogSnippet">
-    <Description>Prefixed <code>Blog*</code> so they're never confused with the dashboard scale &mdash; used internally by <code>KBlogHeader</code>/<code>KBlogSection</code>. See the <a href="blog">Blog</a> page for these in context.</Description>
+    <Description>Prefixed <KCode>Blog*</KCode> so they're never confused with the dashboard scale &mdash; used internally by <KCode>KBlogHeader</KCode>/<KCode>KBlogSection</KCode>. See the <a href="blog">Blog</a> page for these in context.</Description>
     <Example>
         <KText Variant="KTextVariant.BlogDisplay">BlogDisplay</KText>
         <KText Variant="KTextVariant.BlogByline">BlogByline</KText>
@@ -27,8 +27,15 @@
     </Example>
 </DemoSection>
 
+<DemoSection Title="KCode" Code="@CodeSnippet">
+    <Description>Inline code, styled as a small bordered chip &mdash; the boxed look every bare <KCode>&lt;code&gt;</KCode> tag used to get for free from a global CSS rule, now an explicit component instead.</Description>
+    <Example>
+        <KText Variant="KTextVariant.Body">Pass <KCode>Href</KCode> to render <KCode>KCard</KCode> as a link.</KText>
+    </Example>
+</DemoSection>
+
 <DemoSection Title="Color override" Code="@ColorSnippet">
-    <Description>Independent of variant size/weight. Reuses the same status colors as <code>KBadge</code>.</Description>
+    <Description>Independent of variant size/weight. Reuses the same status colors as <KCode>KBadge</KCode>.</Description>
     <Example>
         <KText Variant="KTextVariant.Body" Color="KColor.Muted">Muted</KText>
         <KText Variant="KTextVariant.Body" Color="KColor.Primary">Primary</KText>
@@ -55,6 +62,11 @@
         <KText Variant="KTextVariant.BlogByline">2026-08-10</KText>
         <KText Variant="KTextVariant.BlogIntro">A larger opening paragraph.</KText>
         <KText Variant="KTextVariant.BlogSectionHeading">Section</KText>
+        """;
+
+    private const string CodeSnippet =
+        """
+        <KText Variant="KTextVariant.Body">Pass <KCode>Href</KCode> to render <KCode>KCard</KCode> as a link.</KText>
         """;
 
     private const string ColorSnippet =

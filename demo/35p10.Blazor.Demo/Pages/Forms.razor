@@ -3,10 +3,10 @@
 <PageTitle>35p10.Blazor Demo - Forms</PageTitle>
 
 <KText Variant="KTextVariant.Title">Forms</KText>
-<KText Variant="KTextVariant.Lead">Bindable wrapper components (<code>Value</code>/<code>ValueChanged</code>, so <code>@@bind-Value</code> works) &mdash; no <code>EditForm</code>/<code>EditContext</code> required.</KText>
+<KText Variant="KTextVariant.Lead">Bindable wrapper components (<KCode>Value</KCode>/<KCode>ValueChanged</KCode>, so <KCode>@@bind-Value</KCode> works) &mdash; no <KCode>EditForm</KCode>/<KCode>EditContext</KCode> required.</KText>
 
 <DemoSection Title="KTextInput" Code="@TextInputSnippet">
-    <Description>Wraps <code>&lt;input&gt;</code>; <code>Type</code> defaults to <code>&quot;text&quot;</code>.</Description>
+    <Description>Wraps <KCode>&lt;input&gt;</KCode>; <KCode>Type</KCode> defaults to <KCode>&quot;text&quot;</KCode>.</Description>
     <Example>
         <KTextInput @bind-Value="textValue" Placeholder="Session name" MaxLength="100" />
         <KText Variant="KTextVariant.Muted">Value: @textValue</KText>
@@ -14,7 +14,7 @@
 </DemoSection>
 
 <DemoSection Title="KNumberInput&lt;TValue&gt;" Code="@NumberInputSnippet">
-    <Description>Generic over any numeric <code>struct</code> implementing <code>IParsable&lt;TValue&gt;</code>. <code>Value</code> is nullable &mdash; wire it manually for non-nullable bound properties.</Description>
+    <Description>Generic over any numeric <KCode>struct</KCode> implementing <KCode>IParsable&lt;TValue&gt;</KCode>. <KCode>Value</KCode> is nullable &mdash; wire it manually for non-nullable bound properties.</Description>
     <Example>
         <KNumberInput TValue="double" @bind-Value="numberValue" Step="any" />
         <KText Variant="KTextVariant.Muted">Value: @numberValue</KText>
@@ -22,7 +22,7 @@
 </DemoSection>
 
 <DemoSection Title="KSelect&lt;TValue&gt;" Code="@SelectSnippet">
-    <Description>Wraps <code>&lt;select&gt;</code>; pass <code>&lt;option&gt;</code> elements as <code>ChildContent</code> exactly as you would natively.</Description>
+    <Description>Wraps <KCode>&lt;select&gt;</KCode>; pass <KCode>&lt;option&gt;</KCode> elements as <KCode>ChildContent</KCode> exactly as you would natively.</Description>
     <Example>
         <KSelect @bind-Value="selectValue">
             <option value="a">Option A</option>
@@ -33,21 +33,21 @@
 </DemoSection>
 
 <DemoSection Title="KTextArea" Code="@TextAreaSnippet">
-    <Description><code>resize: vertical</code> by default, plus an optional <code>Monospace</code> flag.</Description>
+    <Description><KCode>resize: vertical</KCode> by default, plus an optional <KCode>Monospace</KCode> flag.</Description>
     <Example>
         <KTextArea @bind-Value="textAreaValue" rows="3" />
     </Example>
 </DemoSection>
 
 <DemoSection Title="KCheckbox" Code="@CheckboxSnippet">
-    <Description>A <code>&lt;label&gt;</code> wrapping <code>&lt;input type=&quot;checkbox&quot;&gt;</code>; bindable via <code>Value</code> (<code>bool</code>).</Description>
+    <Description>A <KCode>&lt;label&gt;</KCode> wrapping <KCode>&lt;input type=&quot;checkbox&quot;&gt;</KCode>; bindable via <KCode>Value</KCode> (<KCode>bool</KCode>).</Description>
     <Example>
         <KCheckbox @bind-Value="checkboxValue">Export panorama</KCheckbox>
     </Example>
 </DemoSection>
 
 <DemoSection Title="KRange&lt;TValue&gt;" Code="@RangeSnippet">
-    <Description>Generic over any <code>struct</code> implementing <code>IParsable&lt;TValue&gt;</code>/<code>IFormattable</code>.</Description>
+    <Description>Generic over any <KCode>struct</KCode> implementing <KCode>IParsable&lt;TValue&gt;</KCode>/<KCode>IFormattable</KCode>.</Description>
     <Example>
         <KRange TValue="double" Min="0" Max="1" Step="0.1" @bind-Value="rangeValue">Level</KRange>
         <KText Variant="KTextVariant.Muted">Value: @rangeValue</KText>
@@ -55,7 +55,7 @@
 </DemoSection>
 
 <DemoSection Title="KFileUpload" Code="@FileUploadSnippet">
-    <Description>Wraps Microsoft's built-in <code>&lt;InputFile&gt;</code>, visually hidden and stretched over the label.</Description>
+    <Description>Wraps Microsoft's built-in <KCode>&lt;InputFile&gt;</KCode>, visually hidden and stretched over the label.</Description>
     <Example>
         <KFileUpload OnChange="HandleFileChange" Accept="image/*">
             <KIcon Name="KIconName.ImageAdd" />

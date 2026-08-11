@@ -1,0 +1,30 @@
+@namespace k35p10.Blazor
+
+<div class="app-shell">
+    @if (Sidebar is not null)
+    {
+        <div class="app-shell-sidebar @(SidebarCollapsed ? "is-collapsed" : string.Empty)">
+            @Sidebar
+        </div>
+    }
+
+    <main>
+        @if (Toolbar is not null && ShowToolbar)
+        {
+            <div class="app-shell-toolbar">
+                @Toolbar
+            </div>
+        }
+        <article class="app-shell-content">
+            @ChildContent
+        </article>
+    </main>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? Sidebar { get; set; }
+    [Parameter] public RenderFragment? Toolbar { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool SidebarCollapsed { get; set; }
+    [Parameter] public bool ShowToolbar { get; set; } = true;
+}

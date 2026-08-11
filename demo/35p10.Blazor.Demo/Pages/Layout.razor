@@ -6,14 +6,14 @@
 <KText Variant="KTextVariant.Lead">Structural chrome: cards, section headers, and the sidebar nav this demo itself uses.</KText>
 
 <DemoSection Title="KCard" Code="@CardSnippet">
-    <Description>A bordered, padded surface. Pass <code>Href</code> to render it as a link instead of a <code>div</code>.</Description>
+    <Description>A bordered, padded surface. Pass <KCode>Href</KCode> to render it as a link instead of a <KCode>div</KCode>.</Description>
     <Example>
         <KText Variant="KTextVariant.Body">Plain card content.</KText>
     </Example>
 </DemoSection>
 
 <DemoSection Title="KSectionHeader" Code="@SectionHeaderSnippet">
-    <Description>A title-left, actions-right flex row that stacks below 640px. When both sides are used, wrap the title side in an explicit <code>&lt;ChildContent&gt;</code> tag &mdash; Razor rejects mixing bare child content with a named <code>&lt;Actions&gt;</code> tag.</Description>
+    <Description>A title-left, actions-right flex row that stacks below 640px. When both sides are used, wrap the title side in an explicit <KCode>&lt;ChildContent&gt;</KCode> tag &mdash; Razor rejects mixing bare child content with a named <KCode>&lt;Actions&gt;</KCode> tag.</Description>
     <Example>
         <KSectionHeader>
             <ChildContent>
@@ -27,7 +27,11 @@
 </DemoSection>
 
 <DemoSection Title="KSidebarNav" Code="@SidebarNavSnippet">
-    <Description>The collapsible sidebar shell you're looking at right now &mdash; brand row, collapse toggle, and the <code>NavLink</code> list. <code>Icon</code> on <code>KNavItem</code> is optional; this demo's own nav omits it.</Description>
+    <Description>The collapsible sidebar shell you're looking at right now &mdash; brand row, collapse toggle, and the <KCode>NavLink</KCode> list. <KCode>Icon</KCode> on <KCode>KNavItem</KCode> is optional; this demo's own nav omits it.</Description>
+</DemoSection>
+
+<DemoSection Title="KAppShell" Code="@AppShellSnippet">
+    <Description>The <KCode>.page</KCode>/<KCode>.sidebar</KCode>/<KCode>main</KCode>/<KCode>article</KCode> grid this whole demo runs inside &mdash; see this page's own <KCode>MainLayout.razor</KCode>. <KCode>Toolbar</KCode>'s visibility is controlled with <KCode>ShowToolbar</KCode>, not by conditionally rendering the <KCode>&lt;Toolbar&gt;</KCode> tag itself (Razor rejects that).</Description>
 </DemoSection>
 
 @code {
@@ -66,5 +70,24 @@
                 new("settings", "Settings"), // Icon is optional
             };
         }
+        """;
+
+    private const string AppShellSnippet =
+        """
+        <KAppShell SidebarCollapsed="isSidebarCollapsed" ShowToolbar="IsPlayerRoute">
+            <Sidebar>
+                <KSidebarNav BrandText="My App" Items="NavItems" IsCollapsed="isSidebarCollapsed"
+                             IsCollapsedChanged="@(c => isSidebarCollapsed = c)" />
+            </Sidebar>
+            <Toolbar>
+                <label class="top-row-upload">
+                    <span>Load Session</span>
+                    <InputFile OnChange="HandleSessionFileChange" accept=".json,application/json" />
+                </label>
+            </Toolbar>
+            <ChildContent>
+                @Body
+            </ChildContent>
+        </KAppShell>
         """;
 }
