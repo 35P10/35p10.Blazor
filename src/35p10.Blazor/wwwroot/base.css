@@ -1,4 +1,9 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 html, body {
+    margin: 0;
     font-family: "Segoe UI", Tahoma, sans-serif;
     background: var(--win98-bg, #e7e7e7);
     color: var(--win98-text, #181818);
@@ -13,4 +18,16 @@ pre {
     border: 1px solid var(--ui-border, #c6c6c6);
     border-radius: 10px;
     background: #fff;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+    border: 0;
 }
