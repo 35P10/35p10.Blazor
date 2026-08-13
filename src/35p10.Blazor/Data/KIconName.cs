@@ -24,4 +24,5 @@ public enum KIconName
     NavPlayer,
     NavStreetView,
     NavSegmentation,
+    NavOnboarding,
 }
