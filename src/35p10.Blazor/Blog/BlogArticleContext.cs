@@ -41,9 +41,18 @@ public sealed class BlogArticleContext : IAsyncDisposable
         ActiveSectionId = id;
         NotifyChanged();
 
-        _module ??= await _js.InvokeAsync<IJSObjectReference>("import", ModulePath);
-        await _module.InvokeVoidAsync("scrollToId", id);
+        await EnsureModuleAsync();
+        await _module!.InvokeVoidAsync("scrollToId", id);
     }
+
+    public async Task AttachInPageHashLinksAsync()
+    {
+        await EnsureModuleAsync();
+        await _module!.InvokeVoidAsync("attachInPageHashLinks");
+    }
+
+    private async Task EnsureModuleAsync() =>
+        _module ??= await _js.InvokeAsync<IJSObjectReference>("import", ModulePath);
 
     private void NotifyChanged() => Changed?.Invoke();
 

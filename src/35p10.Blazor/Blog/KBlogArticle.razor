@@ -32,6 +32,16 @@
         _context.Changed += HandleContextChanged;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await _context.AttachInPageHashLinksAsync();
+    }
+
     private void HandleContextChanged() => InvokeAsync(StateHasChanged);
 
     public async ValueTask DisposeAsync()
