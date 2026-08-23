@@ -7,6 +7,10 @@
     margin: 0 0 0.85rem;
 }
 
+.blog-section.is-subsection {
+    margin: 0 0 1.5rem;
+}
+
 .blog-section-body {
     color: #2a2a2a;
     font-size: 0.94rem;

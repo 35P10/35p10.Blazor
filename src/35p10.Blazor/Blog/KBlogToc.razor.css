@@ -14,7 +14,7 @@
     gap: 0.1rem;
 }
 
-.blog-toc-link {
+::deep .blog-toc-link {
     display: grid;
     grid-template-columns: 1.5rem minmax(0, 1fr);
     gap: 0.35rem;
@@ -33,22 +33,22 @@
     cursor: pointer;
 }
 
-.blog-toc-num {
+::deep .blog-toc-num {
     color: #999;
     font-size: 0.72rem;
     font-variant-numeric: tabular-nums;
 }
 
-.blog-toc-link:hover {
+::deep .blog-toc-link:hover {
     color: var(--win98-blue-strong, #1277a7);
 }
 
-.blog-toc-link.is-active {
+::deep .blog-toc-link.is-active {
     color: #111;
     font-weight: 600;
 }
 
-.blog-toc-link.is-active .blog-toc-num {
+::deep .blog-toc-link.is-active .blog-toc-num {
     color: var(--win98-blue-strong, #1277a7);
 }
 
@@ -67,7 +67,7 @@
         gap: 0.5rem 1rem;
     }
 
-    .blog-toc-link {
+    ::deep .blog-toc-link {
         width: auto;
         grid-template-columns: auto auto;
         padding: 0.2rem 0;

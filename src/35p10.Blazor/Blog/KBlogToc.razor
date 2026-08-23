@@ -5,12 +5,7 @@
     <nav class="blog-toc-nav">
         @foreach (var entry in Context.Sections)
         {
-            <button type="button"
-                    class="blog-toc-link @(Context.ActiveSectionId == entry.Id ? "is-active" : null)"
-                    @onclick="() => Context.ScrollToSectionAsync(entry.Id)">
-                <span class="blog-toc-num">@entry.Number.</span>
-                <span>@entry.Title</span>
-            </button>
+            <KBlogTocEntry Section="entry" />
         }
     </nav>
 </aside>

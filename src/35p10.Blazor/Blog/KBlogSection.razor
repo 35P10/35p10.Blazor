@@ -1,15 +1,21 @@
 @namespace k35p10.Blazor
 
-<section id="@Id" class="blog-section">
-    <KText Variant="KTextVariant.BlogSectionHeading" Class="blog-section-heading">@_number. @Title</KText>
+<section id="@Id" class="blog-section @(_section.Level > 1 ? "is-subsection" : null)">
+    <KText Variant="@(_section.Level > 1 ? KTextVariant.BlogSubsectionHeading : KTextVariant.BlogSectionHeading)"
+           Class="blog-section-heading">@_section.Number. @Title</KText>
     <div class="blog-section-body">
-        @ChildContent
+        <CascadingValue Value="_section" IsFixed="true">
+            @ChildContent
+        </CascadingValue>
     </div>
 </section>
 
 @code {
     [CascadingParameter]
     public BlogArticleContext Context { get; set; } = default!;
+
+    [CascadingParameter]
+    public BlogSectionInfo? Parent { get; set; }
 
     [Parameter, EditorRequired]
     public string Id { get; set; } = string.Empty;
@@ -20,7 +26,7 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
-    private string _number = string.Empty;
+    private BlogSectionInfo _section = default!;
 
-    protected override void OnInitialized() => _number = Context.RegisterSection(Id, Title);
+    protected override void OnInitialized() => _section = Context.RegisterSection(Id, Title, Parent);
 }

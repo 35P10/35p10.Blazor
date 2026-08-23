@@ -10,6 +10,7 @@ public enum KTextVariant
     Muted,
     BlogDisplay,
     BlogSectionHeading,
+    BlogSubsectionHeading,
     BlogByline,
     BlogIntro,
 }

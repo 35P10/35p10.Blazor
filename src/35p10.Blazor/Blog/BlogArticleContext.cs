@@ -22,18 +22,22 @@ public sealed class BlogArticleContext : IAsyncDisposable
 
     public IReadOnlyList<BlogSectionInfo> Sections => _sections;
 
-    public string RegisterSection(string id, string title)
+    public BlogSectionInfo RegisterSection(string id, string title, BlogSectionInfo? parent = null)
     {
-        var existing = _sections.FirstOrDefault(section => section.Id == id);
+        var siblings = parent?.MutableChildren ?? _sections;
+
+        var existing = siblings.FirstOrDefault(section => section.Id == id);
         if (existing is not null)
         {
-            return existing.Number;
+            return existing;
         }
 
-        var number = (_sections.Count + 1).ToString();
-        _sections.Add(new BlogSectionInfo(id, number, title));
+        var position = siblings.Count + 1;
+        var number = parent is null ? position.ToString() : $"{parent.Number}.{position}";
+        var section = new BlogSectionInfo(id, number, title, (parent?.Level ?? 0) + 1);
+        siblings.Add(section);
         NotifyChanged();
-        return number;
+        return section;
     }
 
     public async Task ScrollToSectionAsync(string id)

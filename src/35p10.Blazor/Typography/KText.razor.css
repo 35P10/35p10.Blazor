@@ -58,6 +58,13 @@
     line-height: 1.35;
 }
 
+.text.subsection-heading {
+    color: var(--win98-text, #181818);
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
 .text.byline {
     color: #777;
     font-size: 0.78rem;
