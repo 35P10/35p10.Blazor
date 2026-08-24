@@ -1,0 +1,25 @@
+.blog-card-grid {
+    display: grid;
+    gap: 0.85rem;
+    margin: 1.15rem 0;
+}
+
+.blog-card-grid.cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.blog-card-grid.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.blog-card-grid.cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 760px) {
+    .blog-card-grid.cols-2,
+    .blog-card-grid.cols-3,
+    .blog-card-grid.cols-4 {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

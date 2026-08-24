@@ -1,0 +1,84 @@
+.blog-card {
+    display: grid;
+    align-content: start;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 8px;
+    background: var(--win98-surface, #f4f4f4);
+}
+
+.blog-card.is-dense {
+    gap: 0.35rem;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.95em;
+}
+
+.blog-card.tone-info {
+    background: #f6fbff;
+}
+
+.blog-card.tone-warning {
+    background: #fff8e8;
+}
+
+.blog-card.tone-success {
+    background: #eff8f5;
+}
+
+.blog-card.tone-danger {
+    background: #fdf4f4;
+}
+
+.blog-card.tone-subtle {
+    background: var(--win98-surface-soft, #ededed);
+}
+
+.blog-card.has-accent {
+    border-left: 3px solid var(--ui-border-strong, #a9a9a9);
+    border-radius: 0 8px 8px 0;
+}
+
+.blog-card.has-accent.tone-info {
+    border-left-color: var(--win98-blue-strong, #1277a7);
+}
+
+.blog-card.has-accent.tone-warning {
+    border-left-color: #c9a227;
+}
+
+.blog-card.has-accent.tone-success {
+    border-left-color: var(--win98-success, #176b36);
+}
+
+.blog-card.has-accent.tone-danger {
+    border-left-color: var(--win98-danger, #8f3a3a);
+}
+
+.blog-card ::deep .blog-card-label {
+    color: #8c8c8c;
+    font-size: 0.72rem;
+}
+
+.blog-card ::deep .blog-card-title {
+    margin: 0;
+}
+
+.blog-card ::deep p {
+    margin: 0;
+}
+
+.blog-card ::deep p + p {
+    margin-top: 0.6rem;
+}
+
+.blog-card ::deep ul,
+.blog-card ::deep ol {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.blog-card ::deep li + li {
+    margin-top: 0.35rem;
+}

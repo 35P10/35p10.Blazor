@@ -2,7 +2,9 @@
 
 <section id="@Id" class="blog-section @(_section.Level > 1 ? "is-subsection" : null)">
     <KText Variant="@(_section.Level > 1 ? KTextVariant.BlogSubsectionHeading : KTextVariant.BlogSectionHeading)"
-           Class="blog-section-heading">@_section.Number. @Title</KText>
+           Class="blog-section-heading">
+        <span class="blog-section-number">@_section.Number</span>@Title
+    </KText>
     <div class="blog-section-body">
         <CascadingValue Value="_section" IsFixed="true">
             @ChildContent

@@ -11,6 +11,9 @@
     case "h3":
         <h3 class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</h3>
         break;
+    case "h4":
+        <h4 class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</h4>
+        break;
     case "span":
         <span class="@CssClass" style="@ColorStyle" @attributes="AdditionalAttributes">@ChildContent</span>
         break;
@@ -36,6 +39,7 @@
         KTextVariant.BlogDisplay => "h1",
         KTextVariant.BlogSectionHeading => "h2",
         KTextVariant.BlogSubsectionHeading => "h3",
+        KTextVariant.BlogCardTitle => "h4",
         _ => "p",
     };
 
@@ -49,6 +53,7 @@
         KTextVariant.BlogDisplay => "display",
         KTextVariant.BlogSectionHeading => "section-heading",
         KTextVariant.BlogSubsectionHeading => "subsection-heading",
+        KTextVariant.BlogCardTitle => "card-title",
         KTextVariant.BlogByline => "byline",
         KTextVariant.BlogIntro => "intro",
         _ => "body",

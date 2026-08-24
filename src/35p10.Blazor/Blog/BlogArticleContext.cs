@@ -9,6 +9,7 @@ public sealed class BlogArticleContext : IAsyncDisposable
     private readonly IJSRuntime _js;
     private readonly List<BlogSectionInfo> _sections = [];
     private IJSObjectReference? _module;
+    private DotNetObjectReference<BlogArticleContext>? _selfRef;
 
     public BlogArticleContext(IJSRuntime js, string initialSectionId)
     {
@@ -49,6 +50,45 @@ public sealed class BlogArticleContext : IAsyncDisposable
         await _module!.InvokeVoidAsync("scrollToId", id);
     }
 
+    public async Task StartSectionTrackingAsync()
+    {
+        await EnsureModuleAsync();
+        _selfRef ??= DotNetObjectReference.Create(this);
+        await _module!.InvokeVoidAsync("startSectionTracking", _selfRef);
+    }
+
+    [JSInvokable]
+    public void OnActiveSectionChanged(string id)
+    {
+        if (ActiveSectionId == id)
+        {
+            return;
+        }
+
+        ActiveSectionId = id;
+        NotifyChanged();
+    }
+
+    public bool IsAncestorOfActive(BlogSectionInfo section) =>
+        ActiveSectionId != section.Id &&
+        Find(ActiveSectionId) is { } active &&
+        active.Number.StartsWith($"{section.Number}.", StringComparison.Ordinal);
+
+    private BlogSectionInfo? Find(string id) => Flatten(_sections).FirstOrDefault(section => section.Id == id);
+
+    private static IEnumerable<BlogSectionInfo> Flatten(IEnumerable<BlogSectionInfo> sections)
+    {
+        foreach (var section in sections)
+        {
+            yield return section;
+
+            foreach (var child in Flatten(section.Children))
+            {
+                yield return child;
+            }
+        }
+    }
+
     public async Task AttachInPageHashLinksAsync()
     {
         await EnsureModuleAsync();
@@ -64,7 +104,18 @@ public sealed class BlogArticleContext : IAsyncDisposable
     {
         if (_module is not null)
         {
+            try
+            {
+                await _module.InvokeVoidAsync("stopSectionTracking");
+            }
+            catch (JSDisconnectedException)
+            {
+                // The circuit is already gone; nothing left to detach.
+            }
+
             await _module.DisposeAsync();
         }
+
+        _selfRef?.Dispose();
     }
 }

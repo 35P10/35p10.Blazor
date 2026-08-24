@@ -1,5 +1,7 @@
 .blog-header {
-    margin-bottom: 2rem;
+    margin-bottom: 2.75rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--ui-border, #c6c6c6);
 }
 
 .blog-header.centered {
@@ -9,11 +11,17 @@
 }
 
 ::deep .blog-meta {
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.7rem;
+    color: #8c8c8c;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 ::deep .blog-lead {
-    margin: 0.85rem 0 0;
+    max-width: 62ch;
+    margin: 1.1rem 0 0;
 }
 
 .blog-header.centered ::deep .blog-meta {
@@ -29,10 +37,11 @@
 }
 
 .blog-header ::deep .text.display {
-    font-size: clamp(2.6rem, 6vw, 4rem);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.035em;
+    font-size: clamp(2.8rem, 5.5vw, 3.9rem);
+    font-weight: 750;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
     color: var(--win98-text, #181818);
 }
 

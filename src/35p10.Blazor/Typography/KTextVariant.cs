@@ -11,6 +11,7 @@ public enum KTextVariant
     BlogDisplay,
     BlogSectionHeading,
     BlogSubsectionHeading,
+    BlogCardTitle,
     BlogByline,
     BlogIntro,
 }

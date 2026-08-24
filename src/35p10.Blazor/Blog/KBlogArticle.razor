@@ -40,6 +40,7 @@
         }
 
         await _context.AttachInPageHashLinksAsync();
+        await _context.StartSectionTrackingAsync();
     }
 
     private void HandleContextChanged() => InvokeAsync(StateHasChanged);

@@ -1,0 +1,61 @@
+@namespace k35p10.Blazor
+
+<article class="@CssClass" @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <KText Variant="KTextVariant.Caption" Class="blog-card-label">@Label</KText>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <KText Variant="KTextVariant.BlogCardTitle" Class="blog-card-title">@Title</KText>
+    }
+
+    @ChildContent
+</article>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public KBlogCardTone Tone { get; set; } = KBlogCardTone.Neutral;
+    [Parameter] public bool Accent { get; set; }
+    [Parameter] public bool Dense { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass
+    {
+        get
+        {
+            var classes = new List<string> { "blog-card", ToneClass };
+
+            if (Accent)
+            {
+                classes.Add("has-accent");
+            }
+
+            if (Dense)
+            {
+                classes.Add("is-dense");
+            }
+
+            if (!string.IsNullOrWhiteSpace(Class))
+            {
+                classes.Add(Class);
+            }
+
+            return string.Join(' ', classes);
+        }
+    }
+
+    private string ToneClass => Tone switch
+    {
+        KBlogCardTone.Info => "tone-info",
+        KBlogCardTone.Warning => "tone-warning",
+        KBlogCardTone.Success => "tone-success",
+        KBlogCardTone.Danger => "tone-danger",
+        KBlogCardTone.Subtle => "tone-subtle",
+        _ => "tone-neutral",
+    };
+}

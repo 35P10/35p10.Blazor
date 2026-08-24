@@ -1,7 +1,7 @@
 .blog-shell {
     display: grid;
-    grid-template-columns: minmax(150px, 180px) minmax(0, 1fr);
-    gap: 2rem 2.5rem;
+    grid-template-columns: minmax(160px, 200px) minmax(0, 1fr);
+    gap: 2rem 3rem;
     align-items: stretch;
     height: calc(100dvh - 2.2rem);
     min-height: 0;
@@ -18,8 +18,9 @@
 }
 
 .blog-article {
-    max-width: 60rem;
+    max-width: 58rem;
     margin: 0 auto;
+    padding: 0.75rem 0 4rem;
 }
 
 @media (max-width: 900px) {

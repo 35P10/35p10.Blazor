@@ -1,0 +1,16 @@
+@namespace k35p10.Blazor
+
+<div class="@CssClass" @attributes="AdditionalAttributes">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public int Columns { get; set; } = 2;
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass =>
+        string.Join(' ', new[] { "blog-card-grid", $"cols-{Math.Clamp(Columns, 1, 4)}", Class }
+            .Where(value => !string.IsNullOrWhiteSpace(value)));
+}

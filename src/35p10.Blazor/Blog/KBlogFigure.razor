@@ -1,0 +1,41 @@
+@namespace k35p10.Blazor
+
+<figure class="@CssClass" @attributes="AdditionalAttributes">
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+    else if (!string.IsNullOrWhiteSpace(Src))
+    {
+        <img src="@Src" alt="@Alt" loading="lazy" style="@MaxHeightStyle" />
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Caption) || CaptionContent is not null)
+    {
+        <figcaption>
+            @if (CaptionContent is not null)
+            {
+                @CaptionContent
+            }
+            else
+            {
+                @Caption
+            }
+        </figcaption>
+    }
+</figure>
+
+@code {
+    [Parameter] public string? Src { get; set; }
+    [Parameter] public string? Alt { get; set; }
+    [Parameter] public string? Caption { get; set; }
+    [Parameter] public RenderFragment? CaptionContent { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? MaxHeight { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "blog-figure" : $"blog-figure {Class}";
+
+    private string? MaxHeightStyle => string.IsNullOrWhiteSpace(MaxHeight) ? null : $"max-height: {MaxHeight};";
+}
