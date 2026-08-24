@@ -1,0 +1,158 @@
+@namespace k35p10.Blazor
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div class="image-360-view">
+    <canvas class="image-360-view-canvas" @ref="Canvas"></canvas>
+</div>
+
+@code {
+    private const string ModulePath = "./_content/35p10.Blazor/stimuli/image-stimulus-3d.js";
+
+    [Parameter, EditorRequired] public string ImageSource { get; set; } = string.Empty;
+    [Parameter] public bool Active { get; set; } = true;
+    [Parameter] public double? MarkerU { get; set; }
+    [Parameter] public double? MarkerV { get; set; }
+    [Parameter] public bool ShowHeatmap { get; set; }
+    [Parameter] public IReadOnlyList<HeatmapPoint> HeatmapPoints { get; set; } = [];
+    [Parameter] public double HeatmapLevel { get; set; } = 1.6d;
+    [Parameter] public bool ShowMask { get; set; }
+    [Parameter] public string? MaskSource { get; set; }
+    [Parameter] public EventCallback<string> OnError { get; set; }
+
+    private IJSObjectReference? module;
+    private IJSObjectReference? viewer;
+    private ElementReference Canvas;
+    private string? previousImageSource;
+    private string? lastStateKey;
+    private bool viewerInitialized;
+
+    private object[] BuildHeatmapInteropPoints()
+    {
+        if (!ShowHeatmap || HeatmapPoints.Count == 0)
+        {
+            return [];
+        }
+
+        return HeatmapPoints
+            .Select(point => (object)new
+            {
+                u = point.U,
+                v = point.V,
+                intensity = point.Intensity
+            })
+            .ToArray();
+    }
+
+    private string BuildStateKey() =>
+        FormattableString.Invariant(
+            $"{ImageSource}|m|{MarkerU:0.####}|{MarkerV:0.####}|h|{(ShowHeatmap ? 1 : 0)}|{HeatmapPoints.Count}|{HeatmapLevel:0.##}|{GetHeatmapFingerprint():0.####}|seg|{(ShowMask ? 1 : 0)}|{MaskSource}");
+
+    private double GetHeatmapFingerprint()
+    {
+        if (!ShowHeatmap || HeatmapPoints.Count == 0)
+        {
+            return 0d;
+        }
+
+        var fingerprint = 0d;
+        foreach (var point in HeatmapPoints)
+        {
+            fingerprint += point.U * 7d + point.V * 13d + point.Intensity * 17d;
+        }
+
+        return fingerprint;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.Equals(previousImageSource, ImageSource, StringComparison.Ordinal))
+        {
+            previousImageSource = ImageSource;
+            lastStateKey = null;
+        }
+
+        if (!Active && viewerInitialized)
+        {
+            lastStateKey = null;
+            await DisposeViewerAsync();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!Active || string.IsNullOrWhiteSpace(ImageSource))
+        {
+            return;
+        }
+
+        var stateKey = BuildStateKey();
+        if (viewerInitialized && string.Equals(lastStateKey, stateKey, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        try
+        {
+            await EnsureViewerAsync();
+            await viewer!.InvokeVoidAsync(
+                "update",
+                ImageSource,
+                MarkerU,
+                MarkerV,
+                BuildHeatmapInteropPoints(),
+                HeatmapLevel,
+                ShowMask ? MaskSource : null);
+            lastStateKey = stateKey;
+        }
+        catch (JSException exception)
+        {
+            lastStateKey = stateKey;
+            await DisposeViewerAsync();
+            await OnError.InvokeAsync($"Could not open the 360 view: {exception.Message}");
+        }
+    }
+
+    private async Task EnsureViewerAsync()
+    {
+        module ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath);
+        if (viewer is null)
+        {
+            viewer = await module.InvokeAsync<IJSObjectReference>("createImageStimulusViewer", Canvas);
+            viewerInitialized = true;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeViewerAsync();
+        GC.SuppressFinalize(this);
+    }
+
+    private async Task DisposeViewerAsync()
+    {
+        try
+        {
+            if (viewer is not null)
+            {
+                await viewer.InvokeVoidAsync("dispose");
+                await viewer.DisposeAsync();
+            }
+
+            if (module is not null)
+            {
+                await module.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        finally
+        {
+            viewer = null;
+            module = null;
+            viewerInitialized = false;
+            lastStateKey = null;
+        }
+    }
+}
