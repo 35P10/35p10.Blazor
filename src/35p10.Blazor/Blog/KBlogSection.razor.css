@@ -42,8 +42,6 @@
 }
 
 .blog-section-body ::deep p {
-    /* 62ch of Segoe UI lands near 70 characters per line, inside the comfortable band. */
-    max-width: 62ch;
     margin: 0 0 1.15rem;
 }
 
@@ -53,7 +51,6 @@
 
 .blog-section-body ::deep ul,
 .blog-section-body ::deep ol {
-    max-width: 62ch;
     margin: 0 0 1.15rem;
     padding-left: 1.35rem;
 }
