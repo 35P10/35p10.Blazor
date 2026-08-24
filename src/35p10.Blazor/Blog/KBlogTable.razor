@@ -1,0 +1,71 @@
+@namespace k35p10.Blazor
+
+<figure class="blog-table-figure">
+    <div class="blog-table-wrap">
+        <table class="@TableClass">
+            @if (Widths.Count > 0)
+            {
+                <colgroup>
+                    @foreach (var width in Widths)
+                    {
+                        <col style="width: @width.ToString("0.##", CultureInfo.InvariantCulture)%" />
+                    }
+                </colgroup>
+            }
+            @ChildContent
+        </table>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Caption))
+    {
+        <figcaption class="blog-table-caption">@Caption</figcaption>
+    }
+</figure>
+
+@code {
+    /// <summary>
+    /// Column proportions, in the same shape as a grid template: "0.9fr 0.7fr 1.1fr".
+    /// Turned into percentages so the columns keep the intended ratio.
+    /// </summary>
+    [Parameter]
+    public string? Columns { get; set; }
+
+    /// <summary>Reads every cell with tabular figures, for tables that are all numbers.</summary>
+    [Parameter]
+    public bool Tabular { get; set; }
+
+    [Parameter] public string? Caption { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private List<double> Widths => ParseColumns(Columns);
+
+    private string TableClass =>
+        string.Join(' ', new[]
+        {
+            "blog-table",
+            Widths.Count > 0 ? "is-fixed" : null,
+            Tabular ? "is-tabular" : null,
+            Class,
+        }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    private static List<double> ParseColumns(string? columns)
+    {
+        if (string.IsNullOrWhiteSpace(columns))
+        {
+            return [];
+        }
+
+        var shares = new List<double>();
+        foreach (var part in columns.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (double.TryParse(part.TrimEnd('f', 'r'), NumberStyles.Float, CultureInfo.InvariantCulture, out var share) && share > 0)
+            {
+                shares.Add(share);
+            }
+        }
+
+        var total = shares.Sum();
+        return total > 0 ? shares.Select(share => share / total * 100).ToList() : [];
+    }
+}

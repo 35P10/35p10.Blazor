@@ -1,0 +1,82 @@
+.blog-table-figure {
+    margin: 1rem 0;
+}
+
+.blog-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 8px;
+}
+
+.blog-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.blog-table.is-fixed {
+    table-layout: fixed;
+}
+
+.blog-table ::deep th,
+.blog-table ::deep td {
+    padding: 0.7rem;
+    border-left: 1px solid var(--ui-border, #c6c6c6);
+    text-align: left;
+    vertical-align: top;
+}
+
+.blog-table ::deep th:first-child,
+.blog-table ::deep td:first-child {
+    border-left: 0;
+}
+
+.blog-table ::deep tbody td:first-child {
+    font-weight: 700;
+}
+
+.blog-table ::deep thead th {
+    background: var(--win98-surface-soft, #ededed);
+    color: #444;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.blog-table ::deep tbody tr {
+    border-top: 1px solid var(--ui-border, #c6c6c6);
+}
+
+.blog-table ::deep tr.is-highlight {
+    background: #eaf3fb;
+    box-shadow: inset 3px 0 0 #2f5d8c;
+}
+
+.blog-table ::deep tr.is-highlight td {
+    font-weight: 700;
+}
+
+.blog-table.is-tabular ::deep td,
+.blog-table ::deep td.is-num {
+    font-variant-numeric: tabular-nums;
+}
+
+.blog-table ::deep a {
+    color: var(--win98-blue-strong, #1277a7);
+}
+
+.blog-table-caption {
+    margin: 0.5rem 0 0;
+    color: #5a636c;
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+/* A dense table cannot reflow without losing its header, so it scrolls
+   sideways inside the wrapper and keeps a readable column width. */
+@media (max-width: 760px) {
+    .blog-table {
+        min-width: 32rem;
+    }
+}
