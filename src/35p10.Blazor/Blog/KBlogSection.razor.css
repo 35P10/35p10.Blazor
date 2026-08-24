@@ -38,12 +38,13 @@
 .blog-section-body {
     color: #2b2b2b;
     font-size: 1.14rem;
-    line-height: 1.7;
+    line-height: 1.68;
 }
 
 .blog-section-body ::deep p {
+    /* 62ch of Segoe UI lands near 70 characters per line, inside the comfortable band. */
+    max-width: 62ch;
     margin: 0 0 1.15rem;
-    max-width: 72ch;
 }
 
 .blog-section-body ::deep p:last-child {
@@ -52,9 +53,9 @@
 
 .blog-section-body ::deep ul,
 .blog-section-body ::deep ol {
+    max-width: 62ch;
     margin: 0 0 1.15rem;
     padding-left: 1.35rem;
-    max-width: 72ch;
 }
 
 .blog-section-body ::deep li {

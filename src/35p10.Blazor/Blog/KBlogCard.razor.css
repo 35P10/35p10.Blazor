@@ -1,5 +1,7 @@
 .blog-card {
     display: grid;
+    font-size: 1.04rem;
+    line-height: 1.6;
     align-content: start;
     gap: 0.55rem;
     margin: 0;
