@@ -7,6 +7,8 @@ export function scrollToId(id) {
         return;
     }
 
+    markHashTarget(el);
+
     const container = el.closest(".blog-body");
     if (!container) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -127,6 +129,16 @@ function activeSectionId(container) {
     }
 
     return current;
+}
+
+// history.pushState does not move the document's target element, so :target never
+// fires on an in-page click. Mark the destination explicitly instead.
+function markHashTarget(el) {
+    for (const previous of document.querySelectorAll(".is-hash-target")) {
+        previous.classList.remove("is-hash-target");
+    }
+
+    el.classList.add("is-hash-target");
 }
 
 let hashLinksAttached = false;
