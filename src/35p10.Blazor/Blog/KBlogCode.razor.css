@@ -9,10 +9,18 @@
     line-height: 1.5;
 }
 
+.blog-code.is-boxed {
+    margin: 1rem 0;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 8px;
+    background: var(--win98-surface, #f4f4f4);
+    line-height: 1.6;
+}
+
 .blog-code code {
-    color: inherit;
-    background: transparent;
+    padding: 0;
     border: none;
     border-radius: 0;
-    padding: 0;
+    background: transparent;
+    color: inherit;
 }

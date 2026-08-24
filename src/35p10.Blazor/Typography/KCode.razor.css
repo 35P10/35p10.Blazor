@@ -5,3 +5,13 @@
     background: var(--win98-surface-soft, #ededed);
     font-size: 0.85em;
 }
+
+/* In prose a bordered chip breaks the line; a tint carries the same meaning. */
+.inline-code.is-quiet {
+    padding: 0.1rem 0.35rem;
+    border: none;
+    border-radius: 5px;
+    background: rgba(18, 119, 167, 0.08);
+    color: #0f5f85;
+    font-size: 0.86em;
+}

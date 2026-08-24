@@ -4,8 +4,14 @@
 
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Tinted borderless look, for code inside running prose.</summary>
+    [Parameter] public bool Quiet { get; set; }
+
     [Parameter] public string? Class { get; set; }
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private string CssClass => string.IsNullOrWhiteSpace(Class) ? "inline-code" : $"inline-code {Class}";
+    private string CssClass =>
+        string.Join(' ', new[] { "inline-code", Quiet ? "is-quiet" : null, Class }
+            .Where(value => !string.IsNullOrWhiteSpace(value)));
 }
