@@ -1,0 +1,20 @@
+@namespace k35p10.Blazor
+
+<section class="blog-ref-group">
+    <KText Variant="KTextVariant.BlogCardTitle" Class="blog-ref-group-title">@Title</KText>
+    <ol class="blog-ref-list" start="@Start">
+        @ChildContent
+    </ol>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>Number of the first entry, so the list keeps the report-wide numbering.</summary>
+    [Parameter]
+    public int Start { get; set; } = 1;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

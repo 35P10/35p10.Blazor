@@ -1,0 +1,12 @@
+.blog-cite {
+    color: var(--win98-blue-strong, #1277a7);
+    font-size: 0.78em;
+    font-weight: 700;
+    vertical-align: super;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.blog-cite:hover {
+    text-decoration: underline;
+}

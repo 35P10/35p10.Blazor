@@ -1,0 +1,7 @@
+@namespace k35p10.Blazor
+
+<p class="blog-section-lead">@ChildContent</p>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}
