@@ -1,13 +1,12 @@
 @namespace k35p10.Blazor
 @using System.Globalization
 
-<button type="button"
-        class="blog-toc-link @ActiveClass"
-        style="@IndentStyle"
-        @onclick="() => Context.ScrollToSectionAsync(Section.Id)">
+<a href="#@Section.Id"
+   class="blog-toc-link @ActiveClass"
+   style="@IndentStyle">
     <span class="blog-toc-num">@Section.Number@(Section.Level == 1 ? "." : string.Empty)</span>
     <span>@Section.Title</span>
-</button>
+</a>
 
 @foreach (var child in Section.Children)
 {

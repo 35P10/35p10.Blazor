@@ -1,13 +1,26 @@
 let tracker = null;
 let suppressTrackingUntil = 0;
+let sectionTrackerRef = null;
+let popstateAttached = false;
 
-export function scrollToId(id) {
+export function scrollToId(id, options = {}) {
+    const updateHash = options.updateHash !== false;
+    const push = options.push !== false;
+
     const el = document.getElementById(id);
     if (!el) {
         return;
     }
 
     markHashTarget(el);
+
+    if (updateHash) {
+        setLocationHash(id, push);
+    }
+
+    if (sectionTrackerRef) {
+        sectionTrackerRef.invokeMethodAsync("OnActiveSectionChanged", id);
+    }
 
     const container = el.closest(".blog-body");
     if (!container) {
@@ -30,6 +43,8 @@ export function scrollToId(id) {
 export function startSectionTracking(dotNetRef) {
     stopSectionTracking();
 
+    sectionTrackerRef = dotNetRef;
+
     const container = document.querySelector(".blog-body");
     const toc = document.querySelector(".blog-toc");
     if (!container) {
@@ -49,6 +64,7 @@ export function startSectionTracking(dotNetRef) {
         const id = activeSectionId(container);
         if (id && id !== lastId) {
             lastId = id;
+            setLocationHash(id, false);
             dotNetRef.invokeMethodAsync("OnActiveSectionChanged", id);
             // Blazor paints the new active entry a tick later.
             setTimeout(revealActiveTocEntry, 80);
@@ -108,6 +124,7 @@ export function startSectionTracking(dotNetRef) {
 
 export function stopSectionTracking() {
     if (!tracker) {
+        sectionTrackerRef = null;
         return;
     }
 
@@ -118,6 +135,7 @@ export function stopSectionTracking() {
     }
     tracker.cancel();
     tracker = null;
+    sectionTrackerRef = null;
 }
 
 function revealActiveTocEntry() {
@@ -172,6 +190,21 @@ function markHashTarget(el) {
     el.classList.add("is-hash-target");
 }
 
+function setLocationHash(id, push) {
+    const url = new URL(window.location.href);
+    const next = `#${id}`;
+    if (url.hash === next) {
+        return;
+    }
+
+    url.hash = id;
+    if (push) {
+        history.pushState(null, "", url);
+    } else {
+        history.replaceState(null, "", url);
+    }
+}
+
 let hashLinksAttached = false;
 
 export function attachInPageHashLinks() {
@@ -180,14 +213,30 @@ export function attachInPageHashLinks() {
         document.addEventListener("click", handleInPageHashClick, true);
     }
 
-    scrollToLocationHash();
+    if (!popstateAttached) {
+        popstateAttached = true;
+        window.addEventListener("popstate", () => scrollToLocationHash());
+    }
+
+    // Nested sections register on first paint; retry once if the hash target
+    // is not in the DOM yet.
+    if (!scrollToLocationHash()) {
+        requestAnimationFrame(() => scrollToLocationHash());
+    }
 }
 
 export function scrollToLocationHash() {
     const id = decodeURIComponent((window.location.hash || "").replace(/^#/, ""));
-    if (id) {
-        scrollToId(id);
+    if (!id) {
+        return false;
     }
+
+    if (!document.getElementById(id)) {
+        return false;
+    }
+
+    scrollToId(id, { updateHash: false });
+    return true;
 }
 
 function handleInPageHashClick(event) {
@@ -213,10 +262,6 @@ function handleInPageHashClick(event) {
     event.preventDefault();
     event.stopPropagation();
     scrollToId(id);
-
-    const url = new URL(window.location.href);
-    url.hash = id;
-    history.pushState(null, "", url);
 }
 
 function inPageHashId(anchor) {
