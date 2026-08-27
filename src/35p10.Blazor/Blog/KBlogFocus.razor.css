@@ -103,6 +103,11 @@
     min-width: 0;
 }
 
+.blog-focus.is-open .blog-focus-body {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 @media (max-width: 720px) {
     .blog-focus.is-open .blog-focus-surface {
         inset: 2vh 2.5vw;

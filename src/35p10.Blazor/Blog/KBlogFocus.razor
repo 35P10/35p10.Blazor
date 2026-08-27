@@ -46,7 +46,9 @@
             </div>
         }
         <div class="blog-focus-body">
-            @ChildContent
+            <CascadingValue Value="FocusState">
+                @ChildContent
+            </CascadingValue>
         </div>
     </div>
 </div>
@@ -86,6 +88,8 @@
         }.Where(value => value is not null));
 
     private bool ShowBar => !_open || _closable;
+
+    private BlogFocusState FocusState => new(_open, _open && !_closable);
 
     private Dictionary<string, object>? RootAttributes =>
         string.IsNullOrWhiteSpace(Id) ? null : new Dictionary<string, object> { ["data-focus-id"] = Id };
