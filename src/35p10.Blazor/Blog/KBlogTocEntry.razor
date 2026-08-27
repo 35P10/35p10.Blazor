@@ -1,4 +1,5 @@
 @namespace k35p10.Blazor
+@using System.Globalization
 
 <button type="button"
         class="blog-toc-link @ActiveClass"
@@ -24,5 +25,18 @@
         ? "is-active"
         : Context.IsAncestorOfActive(Section) ? "is-ancestor" : null;
 
-    private string? IndentStyle => Section.Level > 1 ? $"padding-left: {0.55 + (Section.Level - 1) * 0.9:0.##}rem;" : null;
+    private string? IndentStyle
+    {
+        get
+        {
+            if (Section.Level <= 1)
+            {
+                return null;
+            }
+
+            var padding = (0.55 + (Section.Level - 1) * 0.9)
+                .ToString("0.##", CultureInfo.InvariantCulture);
+            return $"padding-left: {padding}rem;";
+        }
+    }
 }
