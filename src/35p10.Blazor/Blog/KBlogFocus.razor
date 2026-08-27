@@ -1,0 +1,206 @@
+@namespace k35p10.Blazor
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="blog-focus @OpenClass" @attributes="RootAttributes">
+    @if (_open)
+    {
+        @if (_closable)
+        {
+            <div class="blog-focus-backdrop" @onclick="CloseAsync"></div>
+        }
+        else
+        {
+            <div class="blog-focus-backdrop" aria-hidden="true"></div>
+        }
+    }
+
+    <div class="blog-focus-surface"
+         role="@(_open ? "dialog" : null)"
+         aria-modal="@(_open ? "true" : null)"
+         aria-label="@(string.IsNullOrWhiteSpace(Title) ? "Focused content" : Title)"
+         tabindex="@(_open ? -1 : null)"
+         @onkeydown="HandleKeyDown"
+         @ref="_surface">
+        @if (ShowBar)
+        {
+            <div class="blog-focus-bar">
+                @if (!string.IsNullOrWhiteSpace(Title))
+                {
+                    <KText Variant="KTextVariant.Caption" Class="blog-focus-title" Tag="span">@Title</KText>
+                }
+                else
+                {
+                    <span class="blog-focus-title-spacer"></span>
+                }
+                @if (!_open || _closable)
+                {
+                    <button type="button"
+                            class="blog-focus-trigger"
+                            aria-expanded="@_open"
+                            @onclick="ToggleAsync"
+                            @ref="_trigger">
+                        @(_open ? "Close" : "Focus")
+                    </button>
+                }
+            </div>
+        }
+        <div class="blog-focus-body">
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    private const string ModulePath = "./_content/35p10.Blazor/blog/blog.js";
+
+    /// <summary>Stable id for deep links: ?focus={Id}</summary>
+    [Parameter] public string? Id { get; set; }
+
+    [Parameter] public string? Title { get; set; }
+
+    /// <summary>
+    /// When false, the open focus has no Close control, backdrop dismiss, or Escape.
+    /// URL <c>?close=0</c> overrides this while the focus is open.
+    /// </summary>
+    [Parameter] public bool Closable { get; set; } = true;
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _open;
+    private bool _closable = true;
+    private bool? _closableFromUrl;
+    private bool _focusSurface;
+    private bool _focusTrigger;
+    private bool _registered;
+    private ElementReference _surface;
+    private ElementReference _trigger;
+    private IJSObjectReference? _module;
+    private DotNetObjectReference<KBlogFocus>? _self;
+
+    private string OpenClass =>
+        string.Join(' ', new[]
+        {
+            _open ? "is-open" : null,
+            _open && !_closable ? "is-bare" : null,
+        }.Where(value => value is not null));
+
+    private bool ShowBar => !_open || _closable;
+
+    private Dictionary<string, object>? RootAttributes =>
+        string.IsNullOrWhiteSpace(Id) ? null : new Dictionary<string, object> { ["data-focus-id"] = Id };
+
+    protected override void OnParametersSet()
+    {
+        _closable = _closableFromUrl ?? Closable;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !string.IsNullOrWhiteSpace(Id))
+        {
+            await EnsureModuleAsync();
+            _self = DotNetObjectReference.Create(this);
+            await _module!.InvokeVoidAsync("registerFocusTarget", Id, _self);
+            _registered = true;
+        }
+
+        if (_focusSurface)
+        {
+            _focusSurface = false;
+            await _surface.FocusAsync();
+        }
+        else if (_focusTrigger && _closable)
+        {
+            _focusTrigger = false;
+            await _trigger.FocusAsync();
+        }
+    }
+
+    [JSInvokable]
+    public Task OnFocusRouteChanged(bool shouldOpen, bool? closableFromUrl)
+    {
+        _closableFromUrl = closableFromUrl;
+        _closable = closableFromUrl ?? Closable;
+
+        if (shouldOpen == _open)
+        {
+            return InvokeAsync(StateHasChanged);
+        }
+
+        _open = shouldOpen;
+        if (shouldOpen)
+        {
+            _focusSurface = true;
+        }
+        else
+        {
+            _focusTrigger = true;
+            _closableFromUrl = null;
+            _closable = Closable;
+        }
+
+        return InvokeAsync(StateHasChanged);
+    }
+
+    private Task ToggleAsync() => _open ? CloseAsync() : OpenAsync();
+
+    private async Task OpenAsync()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            _open = true;
+            _closable = Closable;
+            _focusSurface = true;
+            return;
+        }
+
+        await EnsureModuleAsync();
+        await _module!.InvokeVoidAsync("openFocus", Id, Closable);
+    }
+
+    private async Task CloseAsync()
+    {
+        if (!_open || !_closable)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            _open = false;
+            _focusTrigger = true;
+            return;
+        }
+
+        await EnsureModuleAsync();
+        await _module!.InvokeVoidAsync("closeFocus", Id);
+    }
+
+    private Task HandleKeyDown(KeyboardEventArgs args) =>
+        _open && _closable && args.Key == "Escape" ? CloseAsync() : Task.CompletedTask;
+
+    private async Task EnsureModuleAsync() =>
+        _module ??= await JS.InvokeAsync<IJSObjectReference>("import", ModulePath);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_registered && _module is not null && !string.IsNullOrWhiteSpace(Id))
+        {
+            try
+            {
+                await _module.InvokeVoidAsync("unregisterFocusTarget", Id);
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
+
+        _self?.Dispose();
+    }
+}

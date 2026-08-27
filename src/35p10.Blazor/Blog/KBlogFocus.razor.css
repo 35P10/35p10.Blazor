@@ -1,0 +1,116 @@
+.blog-focus {
+    position: relative;
+    margin: 1rem 0 1.25rem;
+}
+
+.blog-focus-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(18, 18, 18, 0.55);
+}
+
+.blog-focus-surface {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+}
+
+.blog-focus.is-open .blog-focus-surface {
+    position: fixed;
+    z-index: 81;
+    inset: 3.5vh 4vw;
+    display: flex;
+    flex-direction: column;
+    max-width: 72rem;
+    width: auto;
+    margin: 0 auto;
+    padding: 0.85rem 1.1rem 1.25rem;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 14px;
+    background: var(--win98-surface, #f4f4f4);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+    overflow: auto;
+}
+
+.blog-focus-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.55rem;
+}
+
+.blog-focus.is-open .blog-focus-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: -0.15rem -0.25rem 0.75rem;
+    padding: 0.35rem 0.25rem 0.55rem;
+    border-bottom: 1px solid var(--ui-border, #c6c6c6);
+    background: var(--win98-surface, #f4f4f4);
+}
+
+::deep .blog-focus-title {
+    margin: 0;
+    color: #6b6b6b;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.blog-focus-title-spacer {
+    flex: 1;
+}
+
+.blog-focus-trigger {
+    margin-left: auto;
+    padding: 0.28rem 0.65rem;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    border-radius: 8px;
+    background: #fff;
+    color: #333;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+    cursor: pointer;
+}
+
+.blog-focus-trigger:hover {
+    background: #f0f0f0;
+}
+
+.blog-focus.is-open.is-bare .blog-focus-backdrop {
+    background: #111;
+}
+
+.blog-focus.is-open.is-bare .blog-focus-surface {
+    inset: 0;
+    max-width: none;
+    padding: 1rem 1.25rem 1.5rem;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.blog-focus.is-open.is-bare .blog-focus-bar {
+    display: none;
+}
+
+.blog-focus-body {
+    min-width: 0;
+}
+
+@media (max-width: 720px) {
+    .blog-focus.is-open .blog-focus-surface {
+        inset: 2vh 2.5vw;
+        padding: 0.7rem 0.75rem 1rem;
+    }
+
+    .blog-focus.is-open.is-bare .blog-focus-surface {
+        inset: 0;
+        padding: 0.75rem;
+    }
+}

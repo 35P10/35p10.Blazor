@@ -206,6 +206,104 @@ function setLocationHash(id, push) {
 }
 
 let hashLinksAttached = false;
+const focusTargets = new Map();
+
+export function getFocusId() {
+    return new URL(window.location.href).searchParams.get("focus");
+}
+
+/** @returns {boolean|null} null when the URL does not set close */
+export function getFocusClosable() {
+    const value = new URL(window.location.href).searchParams.get("close");
+    if (value === null || value === "") {
+        return null;
+    }
+
+    const normalized = value.trim().toLowerCase();
+    if (["0", "false", "no", "off"].includes(normalized)) {
+        return false;
+    }
+
+    if (["1", "true", "yes", "on"].includes(normalized)) {
+        return true;
+    }
+
+    return null;
+}
+
+export function setFocusRoute(id, closable = null, push = true) {
+    const url = new URL(window.location.href);
+
+    if (id) {
+        url.searchParams.set("focus", id);
+        if (closable === false) {
+            url.searchParams.set("close", "0");
+        } else if (closable === true) {
+            url.searchParams.delete("close");
+        }
+        // closable === null: leave whatever close= is already in the URL
+    } else {
+        url.searchParams.delete("focus");
+        url.searchParams.delete("close");
+    }
+
+    if (push) {
+        history.pushState(null, "", url);
+    } else {
+        history.replaceState(null, "", url);
+    }
+}
+
+export function setFocusId(id, push = true) {
+    setFocusRoute(id, id ? null : null, push);
+}
+
+export function registerFocusTarget(id, dotNetRef) {
+    focusTargets.set(id, dotNetRef);
+    ensurePopstate();
+    syncFocusFromUrl();
+}
+
+export function unregisterFocusTarget(id) {
+    focusTargets.delete(id);
+}
+
+export function openFocus(id, closable = true) {
+    if (!id) {
+        return;
+    }
+
+    setFocusRoute(id, closable !== false, true);
+    syncFocusFromUrl();
+}
+
+export function closeFocus(id) {
+    if (id && getFocusId() === id) {
+        setFocusRoute(null, null, true);
+    }
+
+    syncFocusFromUrl();
+}
+
+function syncFocusFromUrl() {
+    const current = getFocusId();
+    const closable = getFocusClosable();
+    for (const [id, ref] of focusTargets) {
+        ref.invokeMethodAsync("OnFocusRouteChanged", id === current, closable);
+    }
+}
+
+function ensurePopstate() {
+    if (popstateAttached) {
+        return;
+    }
+
+    popstateAttached = true;
+    window.addEventListener("popstate", () => {
+        scrollToLocationHash();
+        syncFocusFromUrl();
+    });
+}
 
 export function attachInPageHashLinks() {
     if (!hashLinksAttached) {
@@ -213,10 +311,7 @@ export function attachInPageHashLinks() {
         document.addEventListener("click", handleInPageHashClick, true);
     }
 
-    if (!popstateAttached) {
-        popstateAttached = true;
-        window.addEventListener("popstate", () => scrollToLocationHash());
-    }
+    ensurePopstate();
 
     // Nested sections register on first paint; retry once if the hash target
     // is not in the DOM yet.
