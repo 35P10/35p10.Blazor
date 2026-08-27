@@ -31,6 +31,7 @@ export function startSectionTracking(dotNetRef) {
     stopSectionTracking();
 
     const container = document.querySelector(".blog-body");
+    const toc = document.querySelector(".blog-toc");
     if (!container) {
         return;
     }
@@ -62,11 +63,38 @@ export function startSectionTracking(dotNetRef) {
         }
     };
 
+    // When the TOC fits the viewport (View360), the wheel over it does nothing:
+    // the article is a sibling scroll pane, not an ancestor. Forward that wheel.
+    // When the TOC overflows (Chart Gaze), leave its own scroll alone.
+    const onTocWheel = (event) => {
+        if (!toc || event.ctrlKey) {
+            return;
+        }
+
+        const delta = event.deltaY;
+        if (delta === 0) {
+            return;
+        }
+
+        if (toc.scrollHeight > toc.clientHeight + 1) {
+            return;
+        }
+
+        container.scrollTop += delta;
+        event.preventDefault();
+    };
+
     container.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
+    if (toc) {
+        toc.addEventListener("wheel", onTocWheel, { passive: false });
+    }
+
     tracker = {
         container,
+        toc,
         onScroll,
+        onTocWheel,
         cancel: () => {
             if (pending) {
                 clearTimeout(pending);
@@ -85,6 +113,9 @@ export function stopSectionTracking() {
 
     tracker.container.removeEventListener("scroll", tracker.onScroll);
     window.removeEventListener("resize", tracker.onScroll);
+    if (tracker.toc && tracker.onTocWheel) {
+        tracker.toc.removeEventListener("wheel", tracker.onTocWheel);
+    }
     tracker.cancel();
     tracker = null;
 }
