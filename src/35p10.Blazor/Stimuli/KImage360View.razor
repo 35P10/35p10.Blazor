@@ -3,7 +3,10 @@
 @implements IAsyncDisposable
 
 <div class="image-360-view">
-    <canvas class="image-360-view-canvas" @ref="Canvas"></canvas>
+    <canvas class="image-360-view-canvas"
+            @ref="Canvas"
+            @onpointerup="ReportCameraAsync"
+            @onwheel="ReportCameraAsync"></canvas>
 </div>
 
 @code {
@@ -19,6 +22,14 @@
     [Parameter] public bool ShowMask { get; set; }
     [Parameter] public string? MaskSource { get; set; }
     [Parameter] public EventCallback<string> OnError { get; set; }
+
+    /// <summary>Dirección y apertura impuestas desde fuera, para compartir cámara entre visores.</summary>
+    [Parameter] public double? CameraYaw { get; set; }
+    [Parameter] public double? CameraPitch { get; set; }
+    [Parameter] public double? CameraFov { get; set; }
+
+    /// <summary>Se dispara cuando el usuario mueve la vista, con la cámara resultante.</summary>
+    [Parameter] public EventCallback<CameraView> CameraChanged { get; set; }
 
     private IJSObjectReference? module;
     private IJSObjectReference? viewer;
@@ -89,6 +100,7 @@
         var stateKey = BuildStateKey();
         if (viewerInitialized && string.Equals(lastStateKey, stateKey, StringComparison.Ordinal))
         {
+            await ApplyCameraAsync();
             return;
         }
 
@@ -104,12 +116,63 @@
                 HeatmapLevel,
                 ShowMask ? MaskSource : null);
             lastStateKey = stateKey;
+            await ApplyCameraAsync();
         }
         catch (JSException exception)
         {
             lastStateKey = stateKey;
             await DisposeViewerAsync();
             await OnError.InvokeAsync($"Could not open the 360 view: {exception.Message}");
+        }
+    }
+
+    private CameraView? lastCamera;
+
+    private async Task ApplyCameraAsync()
+    {
+        if (viewer is null || (CameraYaw is null && CameraPitch is null && CameraFov is null))
+        {
+            return;
+        }
+
+        if (lastCamera is not null && lastCamera.Matches(CameraYaw, CameraPitch, CameraFov))
+        {
+            return;
+        }
+
+        var camera = new CameraView(
+            CameraYaw ?? lastCamera?.Yaw ?? 0d,
+            CameraPitch ?? lastCamera?.Pitch ?? 0d,
+            CameraFov ?? lastCamera?.Fov ?? 75d);
+
+        lastCamera = camera;
+        try
+        {
+            await viewer.InvokeVoidAsync("writeCamera", camera.Yaw, camera.Pitch, camera.Fov);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+
+    private async Task ReportCameraAsync()
+    {
+        if (viewer is null || !CameraChanged.HasDelegate)
+        {
+            return;
+        }
+
+        try
+        {
+            var camera = await viewer.InvokeAsync<CameraView>("readCamera");
+            lastCamera = camera;
+            await CameraChanged.InvokeAsync(camera);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (JSException)
+        {
         }
     }
 

@@ -1661,6 +1661,62 @@ function createPerspectiveMatrix(fov, aspect, near, far) {
     ]);
 }
 
+// Cámara compartida entre los tres visores.
+//
+// Los tres guardan la orientación como cuaternión y el FOV en radianes, así que la lectura y la
+// escritura son las mismas para todos y van como mixin en vez de repetirse en cada clase.
+//
+// El yaw que entra y sale es el del sistema con el que se generan los assets y muestrean los
+// shaders, lon = atan2(x, -z), para que un mismo valor apunte al mismo sitio de la escena en los
+// tres. Con el cubo y la ECP eso es directo. La esfera no: mapea la panorámica por las UV del mesh,
+// y ese mesh deja el texel del centro de la imagen a 90° del sitio donde lo dejan los exportadores.
+// La diferencia se corrige aquí, en la traducción, y no en el mesh: cambiar el mesh giraría también
+// la vista de partida del Player, que no tiene nada que ver con esto.
+const cameraMixin = {
+    readCamera() {
+        const forward = rotateVectorByQuat([0, 0, -1], this.orientation);
+        const offset = this.cameraYawOffset ?? 0;
+        return {
+            yaw: wrapDegrees(Math.atan2(forward[0], -forward[2]) * 180 / Math.PI - offset),
+            pitch: Math.asin(Math.max(-1, Math.min(1, forward[1]))) * 180 / Math.PI,
+            fov: this.fov * 180 / Math.PI
+        };
+    },
+
+    writeCamera(yaw, pitch, fov) {
+        const offset = this.cameraYawOffset ?? 0;
+        const yawRad = ((yaw ?? 0) + offset) * Math.PI / 180;
+        const pitchRad = (pitch ?? 0) * Math.PI / 180;
+        this.orientation = normalizeQuat(multiplyQuats(
+            axisAngleQuat([0, 1, 0], -yawRad),
+            axisAngleQuat([1, 0, 0], pitchRad)
+        ));
+
+        if (Number.isFinite(fov)) {
+            const min = this.minFov ?? (35 * Math.PI / 180);
+            const max = this.maxFov ?? (110 * Math.PI / 180);
+            this.fov = Math.max(min, Math.min(max, fov * Math.PI / 180));
+        }
+    }
+};
+
+function wrapDegrees(degrees) {
+    let wrapped = (degrees + 180) % 360;
+    if (wrapped < 0) {
+        wrapped += 360;
+    }
+
+    return wrapped - 180;
+}
+
+Object.assign(ImageStimulusViewer3D.prototype, cameraMixin);
+Object.assign(CubemapStimulusViewer3D.prototype, cameraMixin);
+Object.assign(EcpStimulusViewer3D.prototype, cameraMixin);
+
+// Las UV del mesh de la esfera dejan el centro de la panorámica 90° girado respecto al sistema de
+// los exportadores. Comprobado texel a texel: esfera(yaw + 90°) muestrea lo mismo que canónico(yaw).
+ImageStimulusViewer3D.prototype.cameraYawOffset = 90;
+
 export function createImageStimulusViewer(canvas) {
     return new ImageStimulusViewer3D(canvas);
 }
