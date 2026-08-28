@@ -21,6 +21,7 @@
     [Parameter] public double HeatmapLevel { get; set; } = 1.6d;
     [Parameter] public bool ShowMask { get; set; }
     [Parameter] public string? MaskSource { get; set; }
+    [Parameter] public double MaskOpacity { get; set; } = 0.6d;
     [Parameter] public EventCallback<string> OnError { get; set; }
 
     /// <summary>Dirección y apertura impuestas desde fuera, para compartir cámara entre visores.</summary>
@@ -57,7 +58,7 @@
 
     private string BuildStateKey() =>
         FormattableString.Invariant(
-            $"{ImageSource}|m|{MarkerU:0.####}|{MarkerV:0.####}|h|{(ShowHeatmap ? 1 : 0)}|{HeatmapPoints.Count}|{HeatmapLevel:0.##}|{GetHeatmapFingerprint():0.####}|seg|{(ShowMask ? 1 : 0)}|{MaskSource}");
+            $"{ImageSource}|m|{MarkerU:0.####}|{MarkerV:0.####}|h|{(ShowHeatmap ? 1 : 0)}|{HeatmapPoints.Count}|{HeatmapLevel:0.##}|{GetHeatmapFingerprint():0.####}|seg|{(ShowMask ? 1 : 0)}|{MaskSource}|{MaskOpacity:0.###}");
 
     private double GetHeatmapFingerprint()
     {
@@ -114,7 +115,8 @@
                 MarkerV,
                 BuildHeatmapInteropPoints(),
                 HeatmapLevel,
-                ShowMask ? MaskSource : null);
+                ShowMask ? MaskSource : null,
+                MaskOpacity);
             lastStateKey = stateKey;
             await ApplyCameraAsync();
         }

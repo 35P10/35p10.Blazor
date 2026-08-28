@@ -12,6 +12,7 @@ class ImageStimulusViewer3D {
         this.maskSrc = null;
         this.maskTexture = null;
         this.hasMask = false;
+        this.maskOpacity = 0.6;
         this.marker = null;
         this.heatmapPoints = [];
         this.heatmapLevel = 1.6;
@@ -48,7 +49,7 @@ class ImageStimulusViewer3D {
         this.frameId = requestAnimationFrame(this.render);
     }
 
-    async update(imageSrc, markerU, markerV, heatmapPoints, heatmapLevel, maskSrc) {
+    async update(imageSrc, markerU, markerV, heatmapPoints, heatmapLevel, maskSrc, maskOpacity = 0.6) {
         if (imageSrc && imageSrc !== this.imageSrc) {
             this.imageSrc = imageSrc;
             await this.loadTexture(imageSrc);
@@ -64,6 +65,7 @@ class ImageStimulusViewer3D {
             }
         }
 
+        this.maskOpacity = clamp(Number.isFinite(maskOpacity) ? maskOpacity : 0.6, 0.1, 1);
         this.heatmapLevel = Number.isFinite(heatmapLevel) ? heatmapLevel : 1.6;
         this.heatmapPoints = buildHeatmapPoints(
             heatmapPoints,
@@ -295,7 +297,7 @@ class ImageStimulusViewer3D {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.hasMask ? this.maskTexture : this.texture);
         gl.uniform1i(program.mask, 1);
-        gl.uniform1f(program.maskOpacity, this.hasMask ? 0.6 : 0);
+        gl.uniform1f(program.maskOpacity, this.hasMask ? this.maskOpacity : 0);
 
         gl.drawElements(gl.TRIANGLES, buffers.indexCount, gl.UNSIGNED_SHORT, 0);
     }
@@ -437,6 +439,7 @@ class CubemapStimulusViewer3D {
         this.maskFaceSourcesKey = null;
         this.maskTexture = null;
         this.hasMask = false;
+        this.maskOpacity = 0.6;
         this.marker = null;
         this.heatmapPoints = [];
         this.heatmapLevel = 1.6;
@@ -472,7 +475,7 @@ class CubemapStimulusViewer3D {
         this.frameId = requestAnimationFrame(this.render);
     }
 
-    async update(faceSources, markerU, markerV, heatmapPoints, heatmapLevel, maskFaceSources) {
+    async update(faceSources, markerU, markerV, heatmapPoints, heatmapLevel, maskFaceSources, maskOpacity = 0.6) {
         const sources = normalizeCubemapSources(faceSources);
         const key = JSON.stringify(sources);
         if (key !== this.faceSourcesKey) {
@@ -491,6 +494,7 @@ class CubemapStimulusViewer3D {
             }
         }
 
+        this.maskOpacity = clamp(Number.isFinite(maskOpacity) ? maskOpacity : 0.6, 0.1, 1);
         this.heatmapLevel = Number.isFinite(heatmapLevel) ? heatmapLevel : 1.6;
         this.heatmapPoints = buildHeatmapPoints(
             heatmapPoints,
@@ -764,7 +768,7 @@ class CubemapStimulusViewer3D {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_CUBE_MAP, this.hasMask ? this.maskTexture : this.texture);
         gl.uniform1i(program.mask, 1);
-        gl.uniform1f(program.maskOpacity, this.hasMask ? 0.6 : 0);
+        gl.uniform1f(program.maskOpacity, this.hasMask ? this.maskOpacity : 0);
 
         gl.drawElements(gl.TRIANGLES, buffers.indexCount, gl.UNSIGNED_SHORT, 0);
     }
@@ -862,6 +866,7 @@ class EcpStimulusViewer3D {
         this.maskSrc = null;
         this.maskTexture = null;
         this.hasMask = false;
+        this.maskOpacity = 0.6;
         this.marker = null;
         this.heatmapPoints = [];
         this.heatmapLevel = 1.6;
@@ -897,7 +902,7 @@ class EcpStimulusViewer3D {
         this.frameId = requestAnimationFrame(this.render);
     }
 
-    async update(imageSrc, equatorialSinLatitudeLimit, markerU, markerV, heatmapPoints, heatmapLevel, maskSrc) {
+    async update(imageSrc, equatorialSinLatitudeLimit, markerU, markerV, heatmapPoints, heatmapLevel, maskSrc, maskOpacity = 0.6) {
         if (Number.isFinite(equatorialSinLatitudeLimit) && equatorialSinLatitudeLimit > 0 && equatorialSinLatitudeLimit < 1) {
             this.equatorialSinLatitudeLimit = equatorialSinLatitudeLimit;
         }
@@ -917,6 +922,7 @@ class EcpStimulusViewer3D {
             }
         }
 
+        this.maskOpacity = clamp(Number.isFinite(maskOpacity) ? maskOpacity : 0.6, 0.1, 1);
         this.heatmapLevel = Number.isFinite(heatmapLevel) ? heatmapLevel : 1.6;
         this.heatmapPoints = buildHeatmapPoints(
             heatmapPoints,
@@ -1156,7 +1162,7 @@ class EcpStimulusViewer3D {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.hasMask ? this.maskTexture : this.texture);
         gl.uniform1i(program.mask, 1);
-        gl.uniform1f(program.maskOpacity, this.hasMask ? 0.6 : 0);
+        gl.uniform1f(program.maskOpacity, this.hasMask ? this.maskOpacity : 0);
 
         gl.drawElements(gl.TRIANGLES, buffers.indexCount, gl.UNSIGNED_SHORT, 0);
     }
@@ -1707,6 +1713,10 @@ function wrapDegrees(degrees) {
     }
 
     return wrapped - 180;
+}
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
 }
 
 Object.assign(ImageStimulusViewer3D.prototype, cameraMixin);
