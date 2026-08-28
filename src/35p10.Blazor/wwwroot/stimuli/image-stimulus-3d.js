@@ -106,6 +106,7 @@ class ImageStimulusViewer3D {
 
     dispose() {
         this.disposed = true;
+        this.stopPointerUvWatch();
         cancelAnimationFrame(this.frameId);
         this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
         this.canvas.removeEventListener("pointermove", this.handlePointerMove);
@@ -555,6 +556,7 @@ class CubemapStimulusViewer3D {
 
     dispose() {
         this.disposed = true;
+        this.stopPointerUvWatch();
         cancelAnimationFrame(this.frameId);
         this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
         this.canvas.removeEventListener("pointermove", this.handlePointerMove);
@@ -995,6 +997,7 @@ class EcpStimulusViewer3D {
 
     dispose() {
         this.disposed = true;
+        this.stopPointerUvWatch();
         cancelAnimationFrame(this.frameId);
         this.canvas.removeEventListener("pointerdown", this.handlePointerDown);
         this.canvas.removeEventListener("pointermove", this.handlePointerMove);
@@ -1706,6 +1709,197 @@ const cameraMixin = {
     }
 };
 
+// Sondeo bajo el puntero.
+//
+// El inverso de uvToSpherePoint / uvToCubePoint / uvToEcpPoint: del pixel del canvas sale un rayo
+// con la camara actual, y de la direccion del rayo sale la UV que le corresponde en la textura.
+// Devuelve la UV en el mismo sistema que el marcador, para que quien la reciba la lea igual.
+const pickMixin = {
+    readUvAt(clientX, clientY) {
+        const rect = this.canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) {
+            return null;
+        }
+
+        const px = (clientX - rect.left) / rect.width;
+        const py = (clientY - rect.top) / rect.height;
+        if (px < 0 || px > 1 || py < 0 || py > 1) {
+            return null;
+        }
+
+        const tanHalf = Math.tan(this.fov / 2);
+        const aspect = rect.width / rect.height;
+        const direction = rotateVectorByQuat(
+            [(px * 2 - 1) * tanHalf * aspect, (1 - py * 2) * tanHalf, -1],
+            this.orientation
+        );
+
+        const length = Math.hypot(direction[0], direction[1], direction[2]);
+        if (!length) {
+            return null;
+        }
+
+        return this.directionToUv([direction[0] / length, direction[1] / length, direction[2] / length]);
+    },
+
+    /**
+     * Avisa que UV toca el raton sobre el canvas, una vez por frame como mucho. Manda (-1, -1)
+     * cuando el puntero sale.
+     */
+    watchPointerUv(dotNetRef) {
+        this.stopPointerUvWatch();
+        if (!dotNetRef) {
+            return;
+        }
+
+        let frame = 0;
+        let outside = true;
+
+        const move = (event) => {
+            if (frame) {
+                return;
+            }
+
+            const { clientX, clientY } = event;
+            frame = requestAnimationFrame(() => {
+                frame = 0;
+                const uv = this.readUvAt(clientX, clientY);
+                if (!uv) {
+                    if (!outside) {
+                        outside = true;
+                        dotNetRef.invokeMethodAsync("OnPointerUv", -1, -1);
+                    }
+
+                    return;
+                }
+
+                outside = false;
+                dotNetRef.invokeMethodAsync("OnPointerUv", uv[0], uv[1]);
+            });
+        };
+
+        const leave = () => {
+            if (frame) {
+                cancelAnimationFrame(frame);
+                frame = 0;
+            }
+
+            if (!outside) {
+                outside = true;
+                dotNetRef.invokeMethodAsync("OnPointerUv", -1, -1);
+            }
+        };
+
+        this.canvas.addEventListener("pointermove", move);
+        this.canvas.addEventListener("pointerleave", leave);
+        this.stopPointerUv = () => {
+            if (frame) {
+                cancelAnimationFrame(frame);
+            }
+
+            this.canvas.removeEventListener("pointermove", move);
+            this.canvas.removeEventListener("pointerleave", leave);
+        };
+    },
+
+    stopPointerUvWatch() {
+        if (this.stopPointerUv) {
+            this.stopPointerUv();
+            this.stopPointerUv = null;
+        }
+    }
+};
+
+// La esfera: latitud y longitud del rayo, deshechos los espejos que aplica uvToSpherePoint.
+ImageStimulusViewer3D.prototype.directionToUv = function (direction) {
+    const phi = Math.acos(Math.max(-1, Math.min(1, direction[1])));
+    let theta = Math.atan2(direction[2], -direction[0]);
+    if (theta < 0) {
+        theta += Math.PI * 2;
+    }
+
+    return [clamp(1 - theta / (Math.PI * 2), 0, 1), clamp(1 - phi / Math.PI, 0, 1)];
+};
+
+// El cubo: la cara es el eje dominante del rayo, y dentro de ella la celda del atlas 3x2.
+CubemapStimulusViewer3D.prototype.directionToUv = function (direction) {
+    const [x, y, z] = direction;
+    const ax = Math.abs(x);
+    const ay = Math.abs(y);
+    const az = Math.abs(z);
+
+    let face;
+    let su;
+    let sv;
+    if (az >= ax && az >= ay) {
+        const t = az;
+        face = z > 0 ? "front" : "back";
+        su = z > 0 ? x / t : -x / t;
+        sv = -y / t;
+    } else if (ax >= ay) {
+        const t = ax;
+        face = x > 0 ? "right" : "left";
+        su = x > 0 ? -z / t : z / t;
+        sv = -y / t;
+    } else {
+        const t = ay;
+        face = y > 0 ? "up" : "down";
+        su = x / t;
+        sv = y > 0 ? z / t : -z / t;
+    }
+
+    const cells = { front: [0, 0], right: [1, 0], back: [2, 0], left: [0, 1], up: [1, 1], down: [2, 1] };
+    const [column, row] = cells[face];
+    const faceU = clamp((su + 1) / 2, 0, 1);
+    const faceV = clamp((sv + 1) / 2, 0, 1);
+    return [(column + faceU) / 3, (row + faceV) / 2];
+};
+
+// La ECP: la banda ecuatorial sale de longitud y sin(latitud); los casquetes, del angulo sobre el
+// disco cuadrado, deshaciendo el mismo reparto por sectores que hace uvToEcpPoint.
+EcpStimulusViewer3D.prototype.directionToUv = function (direction) {
+    const limit = Math.min(0.95, Math.max(0.05, this.equatorialSinLatitudeLimit));
+    const sinLatitude = Math.max(-1, Math.min(1, direction[1]));
+    const longitude = Math.atan2(direction[0], -direction[2]);
+
+    if (Math.abs(sinLatitude) <= limit) {
+        const turn = clamp((longitude + Math.PI) / (2 * Math.PI), 0, 0.999999) * 4;
+        const face = Math.min(3, Math.floor(turn));
+        const localU = turn - face;
+        const localV = clamp((1 - sinLatitude / limit) / 2, 0, 1);
+        return face < 3
+            ? [(face + localU) / 3, localV / 2]
+            : [(1 + localU) / 3, (1 + localV) / 2];
+    }
+
+    const isNorth = sinLatitude > 0;
+    const poleBlend = isNorth ? 1 - sinLatitude : sinLatitude + 1;
+    const discRadius = clamp(Math.sqrt(poleBlend / (1 - limit)), 0, 1);
+    const quarter = Math.PI / 4;
+    const angle = wrapAngle(longitude);
+
+    let x;
+    let y;
+    if (angle >= -quarter && angle <= quarter) {
+        x = discRadius;
+        y = discRadius * (angle / quarter);
+    } else if (angle > quarter && angle < 3 * quarter) {
+        x = discRadius * ((Math.PI / 2 - angle) / quarter);
+        y = discRadius;
+    } else if (angle < -quarter && angle > -3 * quarter) {
+        x = discRadius * ((angle + Math.PI / 2) / quarter);
+        y = -discRadius;
+    } else {
+        x = -discRadius;
+        y = discRadius * (wrapAngle(Math.PI - angle) / quarter);
+    }
+
+    const localU = clamp((x + 1) / 2, 0, 1);
+    const localV = clamp((y + 1) / 2, 0, 1);
+    const column = isNorth ? 0 : 2;
+    return [(column + localU) / 3, (1 + localV) / 2];
+};
+
 function wrapDegrees(degrees) {
     let wrapped = (degrees + 180) % 360;
     if (wrapped < 0) {
@@ -1722,6 +1916,10 @@ function clamp(value, min, max) {
 Object.assign(ImageStimulusViewer3D.prototype, cameraMixin);
 Object.assign(CubemapStimulusViewer3D.prototype, cameraMixin);
 Object.assign(EcpStimulusViewer3D.prototype, cameraMixin);
+
+Object.assign(ImageStimulusViewer3D.prototype, pickMixin);
+Object.assign(CubemapStimulusViewer3D.prototype, pickMixin);
+Object.assign(EcpStimulusViewer3D.prototype, pickMixin);
 
 // Las UV del mesh de la esfera dejan el centro de la panorámica 90° girado respecto al sistema de
 // los exportadores. Comprobado texel a texel: esfera(yaw + 90°) muestrea lo mismo que canónico(yaw).

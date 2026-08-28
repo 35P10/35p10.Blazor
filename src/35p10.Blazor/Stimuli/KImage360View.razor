@@ -32,6 +32,28 @@
     /// <summary>Se dispara cuando el usuario mueve la vista, con la cámara resultante.</summary>
     [Parameter] public EventCallback<CameraView> CameraChanged { get; set; }
 
+    /// <summary>Se dispara al mover el raton sobre la escena, con la UV que toca. Null al salir.</summary>
+    [Parameter] public EventCallback<PointerUv?> HoverUvChanged { get; set; }
+
+    private DotNetObjectReference<KImage360View>? pointerUvRef;
+    private bool pointerUvWatched;
+
+    [JSInvokable]
+    public Task OnPointerUv(double u, double v) =>
+        HoverUvChanged.InvokeAsync(u < 0 || v < 0 ? null : new PointerUv(u, v));
+
+    private async Task EnsurePointerUvWatchAsync()
+    {
+        if (viewer is null || pointerUvWatched || !HoverUvChanged.HasDelegate)
+        {
+            return;
+        }
+
+        pointerUvRef ??= DotNetObjectReference.Create(this);
+        await viewer.InvokeVoidAsync("watchPointerUv", pointerUvRef);
+        pointerUvWatched = true;
+    }
+
     private IJSObjectReference? module;
     private IJSObjectReference? viewer;
     private ElementReference Canvas;
@@ -186,11 +208,14 @@
             viewer = await module.InvokeAsync<IJSObjectReference>("createImageStimulusViewer", Canvas);
             viewerInitialized = true;
         }
+
+        await EnsurePointerUvWatchAsync();
     }
 
     public async ValueTask DisposeAsync()
     {
         await DisposeViewerAsync();
+        pointerUvRef?.Dispose();
         GC.SuppressFinalize(this);
     }
 
@@ -217,6 +242,7 @@
             viewer = null;
             module = null;
             viewerInitialized = false;
+            pointerUvWatched = false;
             lastStateKey = null;
         }
     }
