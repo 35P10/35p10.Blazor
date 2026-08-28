@@ -311,8 +311,8 @@ class ImageStimulusViewer3D {
     }
 
     resizeCanvas() {
-        const width = this.canvas.clientWidth;
-        const height = this.canvas.clientHeight;
+        const width = Math.max(1, Math.round(this.canvas.clientWidth));
+        const height = Math.max(1, Math.round(this.canvas.clientHeight));
         if (this.canvas.width !== width || this.canvas.height !== height) {
             this.canvas.width = width;
             this.canvas.height = height;
@@ -774,8 +774,8 @@ class CubemapStimulusViewer3D {
     }
 
     resizeCanvas() {
-        const width = this.canvas.clientWidth;
-        const height = this.canvas.clientHeight;
+        const width = Math.max(1, Math.round(this.canvas.clientWidth));
+        const height = Math.max(1, Math.round(this.canvas.clientHeight));
         if (this.canvas.width !== width || this.canvas.height !== height) {
             this.canvas.width = width;
             this.canvas.height = height;
@@ -1168,8 +1168,8 @@ class EcpStimulusViewer3D {
     }
 
     resizeCanvas() {
-        const width = this.canvas.clientWidth;
-        const height = this.canvas.clientHeight;
+        const width = Math.max(1, Math.round(this.canvas.clientWidth));
+        const height = Math.max(1, Math.round(this.canvas.clientHeight));
         if (this.canvas.width !== width || this.canvas.height !== height) {
             this.canvas.width = width;
             this.canvas.height = height;
