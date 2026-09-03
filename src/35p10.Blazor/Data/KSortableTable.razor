@@ -12,7 +12,56 @@
     @Columns
 </CascadingValue>
 
-<KTable Class="@Class" MaxHeight="@MaxHeight" @attributes="AdditionalAttributes">
+@if (Variant == KSortableTableVariant.Blog)
+{
+    <KBlogTable Class="@Class" Columns="@ColumnRatios" Caption="@Caption" Tabular="@Tabular">
+        @Grid
+    </KBlogTable>
+}
+else
+{
+    <KTable Class="@Class" MaxHeight="@MaxHeight" @attributes="AdditionalAttributes">
+        @Grid
+    </KTable>
+}
+
+@code {
+    private readonly List<KColumn<TItem>> _columns = [];
+
+    private KColumn<TItem>? _sortColumn;
+    private bool _descending;
+    private bool _pendingColumns;
+
+    /// <summary>Declaraciones de columna: solo <see cref="KColumn{TItem}" />.</summary>
+    [Parameter, EditorRequired] public RenderFragment? Columns { get; set; }
+
+    [Parameter, EditorRequired] public IEnumerable<TItem> Items { get; set; } = [];
+
+    /// <summary>Clase por fila, para marcar la seleccionada o la de referencia.</summary>
+    [Parameter] public Func<TItem, string?>? RowClass { get; set; }
+
+    [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter] public string? MaxHeight { get; set; }
+
+    /// <summary>Carcasa: la tabla de datos de la app o la del cuerpo del artículo.</summary>
+    [Parameter] public KSortableTableVariant Variant { get; set; }
+
+    /// <summary>
+    ///     Solo en <see cref="KSortableTableVariant.Blog" />: proporciones de columna en el mismo
+    ///     formato que KBlogTable, "0.9fr 0.7fr 1.1fr".
+    /// </summary>
+    [Parameter] public string? ColumnRatios { get; set; }
+
+    [Parameter] public string? Caption { get; set; }
+
+    [Parameter] public bool Tabular { get; set; }
+
+    /// <summary>Cabecera y filas, compartidas por las dos carcasas.</summary>
+    private RenderFragment Grid => __builder =>
+    {
     <thead>
         <tr>
             @foreach (var column in _columns)
@@ -50,28 +99,7 @@
             </tr>
         }
     </tbody>
-</KTable>
-
-@code {
-    private readonly List<KColumn<TItem>> _columns = [];
-
-    private KColumn<TItem>? _sortColumn;
-    private bool _descending;
-    private bool _pendingColumns;
-
-    /// <summary>Declaraciones de columna: solo <see cref="KColumn{TItem}" />.</summary>
-    [Parameter, EditorRequired] public RenderFragment? Columns { get; set; }
-
-    [Parameter, EditorRequired] public IEnumerable<TItem> Items { get; set; } = [];
-
-    /// <summary>Clase por fila, para marcar la seleccionada o la de referencia.</summary>
-    [Parameter] public Func<TItem, string?>? RowClass { get; set; }
-
-    [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
-
-    [Parameter] public string? Class { get; set; }
-
-    [Parameter] public string? MaxHeight { get; set; }
+    };
 
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
