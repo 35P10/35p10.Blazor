@@ -1,0 +1,38 @@
+::deep .k-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: -0.2rem -0.35rem;
+    padding: 0.2rem 0.35rem;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+::deep .k-sort:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+::deep .k-sort:focus-visible {
+    outline: 2px solid var(--win98-blue-strong, #1ba1e2);
+    outline-offset: 1px;
+}
+
+::deep .k-sort-mark {
+    color: #8a9199;
+    font-size: 0.8em;
+    line-height: 1;
+}
+
+::deep .k-sort.is-active .k-sort-mark {
+    color: var(--win98-blue-strong, #1ba1e2);
+}
+
+::deep th[aria-sort="ascending"],
+::deep th[aria-sort="descending"] {
+    background: var(--win98-surface-soft, #e9eef2);
+}

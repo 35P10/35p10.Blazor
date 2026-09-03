@@ -1,0 +1,150 @@
+@namespace k35p10.Blazor
+@typeparam TItem
+@*
+    Tabla con orden por columna.
+
+    KTable sigue siendo el envoltorio fino sobre <table> para markup escrito a mano. Esta variante
+    toma los datos y las columnas declaradas, y solo deja ordenar por aquellas a las que el
+    consumidor le pasa SortBy: el resto quedan como cabeceras planas.
+*@
+
+<CascadingValue Value="this" IsFixed="true">
+    @Columns
+</CascadingValue>
+
+<KTable Class="@Class" MaxHeight="@MaxHeight" @attributes="AdditionalAttributes">
+    <thead>
+        <tr>
+            @foreach (var column in _columns)
+            {
+                var state = SortStateOf(column);
+                <th class="@(column.Numeric ? "is-num" : null)"
+                    style="@(column.Width is null ? null : $"width: {column.Width};")"
+                    aria-sort="@AriaSort(state)">
+                    @if (column.SortBy is null)
+                    {
+                        @column.Title
+                    }
+                    else
+                    {
+                        <button type="button" class="k-sort @(state is null ? null : "is-active")"
+                                @onclick="() => ToggleSort(column)"
+                                title="@($"Sort by {column.Title}")">
+                            <span>@column.Title</span>
+                            <span class="k-sort-mark" aria-hidden="true">@Mark(state)</span>
+                        </button>
+                    }
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in SortedItems)
+        {
+            <tr class="@RowClass?.Invoke(item)" @key="item"
+                @onclick="() => OnRowClick.InvokeAsync(item)">
+                @foreach (var column in _columns)
+                {
+                    <td class="@(column.Numeric ? "is-num" : null)">@column.ChildContent?.Invoke(item)</td>
+                }
+            </tr>
+        }
+    </tbody>
+</KTable>
+
+@code {
+    private readonly List<KColumn<TItem>> _columns = [];
+
+    private KColumn<TItem>? _sortColumn;
+    private bool _descending;
+    private bool _pendingColumns;
+
+    /// <summary>Declaraciones de columna: solo <see cref="KColumn{TItem}" />.</summary>
+    [Parameter, EditorRequired] public RenderFragment? Columns { get; set; }
+
+    [Parameter, EditorRequired] public IEnumerable<TItem> Items { get; set; } = [];
+
+    /// <summary>Clase por fila, para marcar la seleccionada o la de referencia.</summary>
+    [Parameter] public Func<TItem, string?>? RowClass { get; set; }
+
+    [Parameter] public EventCallback<TItem> OnRowClick { get; set; }
+
+    [Parameter] public string? Class { get; set; }
+
+    [Parameter] public string? MaxHeight { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    /// <summary>
+    ///     Sin columna de orden se respeta el orden en que llegan los datos, que suele ser el que el
+    ///     consumidor eligió a propósito.
+    /// </summary>
+    private IEnumerable<TItem> SortedItems
+    {
+        get
+        {
+            if (_sortColumn?.SortBy is not { } key)
+            {
+                return Items;
+            }
+
+            return _descending
+                ? Items.OrderByDescending(key, NullsLast)
+                : Items.OrderBy(key, NullsLast);
+        }
+    }
+
+    /// <summary>Las columnas se registran durante su propio render, así que hay que repintar después.</summary>
+    internal void Register(KColumn<TItem> column)
+    {
+        _columns.Add(column);
+        _pendingColumns = true;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_pendingColumns)
+        {
+            _pendingColumns = false;
+            StateHasChanged();
+        }
+    }
+
+    /// <summary>Ciclo de tres pasos: ascendente, descendente y vuelta al orden original.</summary>
+    private void ToggleSort(KColumn<TItem> column)
+    {
+        if (_sortColumn != column)
+        {
+            _sortColumn = column;
+            _descending = false;
+        }
+        else if (!_descending)
+        {
+            _descending = true;
+        }
+        else
+        {
+            _sortColumn = null;
+            _descending = false;
+        }
+    }
+
+    private bool? SortStateOf(KColumn<TItem> column) =>
+        _sortColumn == column ? _descending : null;
+
+    private static string AriaSort(bool? state) =>
+        state is null ? "none" : state.Value ? "descending" : "ascending";
+
+    private static string Mark(bool? state) =>
+        state is null ? "↕" : state.Value ? "↓" : "↑";
+
+    /// <summary>Los huecos van al final en las dos direcciones: no son ni el máximo ni el mínimo.</summary>
+    private static readonly IComparer<IComparable?> NullsLast =
+        Comparer<IComparable?>.Create((left, right) => (left, right) switch
+        {
+            (null, null) => 0,
+            (null, _) => 1,
+            (_, null) => -1,
+            _ => left.CompareTo(right),
+        });
+}

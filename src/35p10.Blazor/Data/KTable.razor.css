@@ -37,3 +37,8 @@
 ::deep .table-row-active {
     background: rgba(27, 161, 226, 0.1);
 }
+
+::deep .table .is-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
