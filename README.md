@@ -42,6 +42,14 @@ And add the namespace to `_Imports.razor`:
 @using k35p10.Blazor
 ```
 
+### Library resources
+
+The library includes public resources under `_content/35p10.Blazor/resources/`. For example, to use the included icon as a browser tab icon:
+
+```html
+<link rel="icon" type="image/png" href="_content/35p10.Blazor/resources/Lilito.png" />
+```
+
 ### Cloning a repo that already uses the submodule
 
 ```bash
