@@ -99,6 +99,14 @@
     display: none;
 }
 
+/* En modo kiosco la superficie ocupa toda la pantalla, pero el contenido no: sin tope, en un
+   monitor ancho los controles se estiran de borde a borde y el visual queda estirado y raro. */
+.blog-focus.is-open.is-bare .blog-focus-body {
+    width: 100%;
+    max-width: 100rem;
+    margin-inline: auto;
+}
+
 .blog-focus-body {
     min-width: 0;
 }

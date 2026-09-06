@@ -1,0 +1,28 @@
+@namespace k35p10.Blazor
+@typeparam TItem
+@* Declaración de una columna de KSortableTable. No renderiza nada por sí sola: se registra en la
+   tabla, que es quien pinta la cabecera y las celdas. *@
+
+@code {
+    [CascadingParameter] private KSortableTable<TItem>? Table { get; set; }
+
+    /// <summary>Texto de la cabecera.</summary>
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+
+    /// <summary>Contenido de la celda para cada fila.</summary>
+    [Parameter, EditorRequired] public RenderFragment<TItem>? ChildContent { get; set; }
+
+    /// <summary>
+    ///     Clave de orden. Cuando es null la columna no se puede ordenar, que es el caso de las
+    ///     columnas de texto libre o de acciones.
+    /// </summary>
+    [Parameter] public Func<TItem, IComparable?>? SortBy { get; set; }
+
+    /// <summary>Alinea la columna a la derecha, para cifras.</summary>
+    [Parameter] public bool Numeric { get; set; }
+
+    /// <summary>Ancho CSS fijo de la columna. Opcional.</summary>
+    [Parameter] public string? Width { get; set; }
+
+    protected override void OnInitialized() => Table?.Register(this);
+}

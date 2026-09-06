@@ -20,6 +20,20 @@
     </Example>
 </DemoSection>
 
+<DemoSection Title="KSortableTable" Code="@SortableSnippet">
+    <Description>Same table, but the columns you give a <KCode>SortBy</KCode> to become sortable: click cycles ascending, descending, original order. Columns without <KCode>SortBy</KCode> stay plain headers.</Description>
+    <Example>
+        <KSortableTable TItem="Metric" Items="Metrics">
+            <Columns>
+                <KColumn TItem="Metric" Title="Model" SortBy="@(m => m.Model)">@context.Model</KColumn>
+                <KColumn TItem="Metric" Title="mIoU" Numeric SortBy="@(m => m.MeanIou)">@context.MeanIou.ToString("0.000")</KColumn>
+                <KColumn TItem="Metric" Title="ms/frame" Numeric SortBy="@(m => m.Milliseconds)">@context.Milliseconds</KColumn>
+                <KColumn TItem="Metric" Title="Notes">@context.Notes</KColumn>
+            </Columns>
+        </KSortableTable>
+    </Example>
+</DemoSection>
+
 <DemoSection Title="KStatList" Code="@StatListSnippet">
     <Description>Three variants found across the app: <KCode>Inline</KCode> (label column beside the value), <KCode>Stacked</KCode> (small uppercase label above the value), and <KCode>Grid</KCode> (each pair its own tile).</Description>
     <Example>
@@ -62,6 +76,27 @@
 </DemoSection>
 
 @code {
+    private sealed record Metric(string Model, double MeanIou, int Milliseconds, string Notes);
+
+    private static readonly Metric[] Metrics =
+    [
+        new("segformer-b0", 0.612, 84, "baseline"),
+        new("segformer-b2", 0.694, 173, "8K tiles"),
+        new("mask2former", 0.731, 402, "too slow on device"),
+        new("trans4pass", 0.688, 145, "panoramic"),
+    ];
+
+    private const string SortableSnippet =
+        """
+        <KSortableTable TItem="Metric" Items="Metrics">
+            <Columns>
+                <KColumn TItem="Metric" Title="Model" SortBy="@(m => m.Model)">@context.Model</KColumn>
+                <KColumn TItem="Metric" Title="mIoU" Numeric SortBy="@(m => m.MeanIou)">@context.MeanIou</KColumn>
+                <KColumn TItem="Metric" Title="Notes">@context.Notes</KColumn>
+            </Columns>
+        </KSortableTable>
+        """;
+
     private const string TableSnippet =
         """
         <KTable MaxHeight="600px">
