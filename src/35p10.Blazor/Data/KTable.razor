@@ -1,18 +1,105 @@
 @namespace k35p10.Blazor
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 
-<div class="table-wrap" style="@WrapStyle">
+<div class="table-wrap" style="@WrapStyle" @ref="wrap">
     <table class="@TableClass" @attributes="AdditionalAttributes">
         @ChildContent
     </table>
 </div>
 
 @code {
+    private const string ModulePath = "./_content/35p10.Blazor/data/table-resize.js";
+
+    private ElementReference wrap;
+    private IJSObjectReference? module;
+    private bool enabled;
+
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string? Class { get; set; }
     [Parameter] public string? MaxHeight { get; set; }
+
+    /// <summary>
+    ///     Lets the reader drag the right edge of a header to change the width of that column, and
+    ///     double-click it to give the column back to its content. The columns are pinned in pixels
+    ///     the first time this happens, so the table stops squeezing cells to fit and scrolls
+    ///     sideways inside its own box instead.
+    /// </summary>
+    [Parameter] public bool Resizable { get; set; }
+
+    /// <summary>
+    ///     Under which name the widths are remembered in the browser. Without it the resizing still
+    ///     works, it is just forgotten when the page is left. Columns are told apart by their
+    ///     <c>data-column</c> attribute, or by their header text when there is none.
+    /// </summary>
+    [Parameter] public string? ResizeKey { get; set; }
+
+    /// <summary>
+    ///     Changes when the columns do — a column added or removed — so the widths are measured
+    ///     again instead of being applied to a table that no longer has that shape.
+    /// </summary>
+    [Parameter] public string? ColumnSignature { get; set; }
+
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string TableClass => string.IsNullOrWhiteSpace(Class) ? "table" : $"table {Class}";
 
     private string? WrapStyle => string.IsNullOrWhiteSpace(MaxHeight) ? null : $"max-height: {MaxHeight};";
+
+    private string State => $"{Resizable}|{ResizeKey}|{ColumnSignature}";
+
+    private string? appliedState;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await module.InvokeVoidAsync("disableColumnResize", wrap);
+            await module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+            // The circuit is gone and the listeners went with the page.
+        }
+        catch (InvalidOperationException)
+        {
+            // Prerendering: there was never anything attached.
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Nothing to talk to while the page is static HTML; the table is readable there, only not
+        // resizable.
+        if (!RendererInfo.IsInteractive || appliedState == State)
+        {
+            return;
+        }
+
+        try
+        {
+            module ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath);
+
+            if (Resizable)
+            {
+                await module.InvokeVoidAsync("enableColumnResize", wrap, ResizeKey);
+            }
+            else if (enabled)
+            {
+                await module.InvokeVoidAsync("disableColumnResize", wrap);
+            }
+
+            enabled = Resizable;
+            appliedState = State;
+        }
+        catch (JSDisconnectedException)
+        {
+            // The circuit closed while the table was being set up.
+        }
+    }
 }

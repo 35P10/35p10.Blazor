@@ -31,3 +31,11 @@ pre {
     clip-path: inset(50%);
     border: 0;
 }
+
+/* While a KTable column is being dragged, the cursor is the gesture: it must not change over
+   whatever the pointer happens to cross. Global because the class lands on the body, which no
+   component's scoped styles can reach. */
+body.k-column-resizing,
+body.k-column-resizing * {
+    cursor: col-resize !important;
+}

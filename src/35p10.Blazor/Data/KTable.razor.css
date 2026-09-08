@@ -42,3 +42,54 @@
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
+
+/* Column resizing. The grip is the edge between two headers: a divider line — the same line a
+   spreadsheet shows — with a grab area that straddles it, so it can be caught without aiming. */
+::deep .k-column-grip {
+    position: absolute;
+    top: 0;
+    right: -6px;
+    width: 12px;
+    height: 100%;
+    z-index: 2;
+    cursor: col-resize;
+    touch-action: none;
+    background: transparent;
+}
+
+/* The line itself, drawn inside the grab area so the area can be wider than the line. */
+::deep .k-column-grip::after {
+    content: "";
+    position: absolute;
+    top: 20%;
+    bottom: 20%;
+    left: 6px;
+    width: 1px;
+    background: var(--ui-border, #c6c6c6);
+}
+
+::deep .table th:hover .k-column-grip::after,
+::deep .k-column-grip.is-active::after {
+    top: 0;
+    bottom: 0;
+    background: var(--win98-blue-strong, #0a246a);
+}
+
+::deep .table thead th {
+    position: relative;
+}
+
+/* A header has to be able to become narrower than its own text, or dragging a column inwards
+   stops at the width of the word and the drag feels broken. */
+::deep .table.is-resizable th,
+::deep .table.is-resizable td {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Nothing selects while a column is being dragged, and the cursor stays the gesture wherever the
+   pointer goes. */
+::deep .table.is-resizing {
+    user-select: none;
+}
