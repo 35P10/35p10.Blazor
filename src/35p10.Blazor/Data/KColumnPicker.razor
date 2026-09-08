@@ -16,6 +16,13 @@
             <KText Variant="KTextVariant.Muted">@ChildContent</KText>
         }
 
+        @if (Header is not null)
+        {
+            @* Whatever the owner of the table wants above the list: saved sets of columns, a search
+               among them, a warning. *@
+            <div class="column-picker-header">@Header</div>
+        }
+
         <ul class="column-picker-list">
             @foreach (var (column, index) in Columns.Select((column, index) => (column, index)))
             {
@@ -64,6 +71,9 @@
 
     /// <summary>An optional line of explanation, in the words of whoever owns the table.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Anything to put above the list — saved column sets, for instance.</summary>
+    [Parameter] public RenderFragment? Header { get; set; }
 
     [Parameter] public EventCallback<string> OnToggle { get; set; }
 

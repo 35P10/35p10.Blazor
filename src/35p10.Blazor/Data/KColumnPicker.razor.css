@@ -4,6 +4,13 @@
     min-width: min(24rem, 80vw);
 }
 
+.column-picker-header {
+    display: grid;
+    gap: 0.4rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--ui-border, #c6c6c6);
+}
+
 .column-picker-list {
     display: grid;
     gap: 0.25rem;
