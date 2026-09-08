@@ -45,18 +45,52 @@ const write = (key, widths) => {
 /** What a column is called in storage: whatever the table says, or else its header text. */
 const columnKey = (th) => th.dataset.column ?? th.textContent.trim();
 
+/** Which columns this table has right now, in order: what a stored width was measured against. */
+const signatureOf = (headers) => headers.map(columnKey).join(',');
+
+/**
+ * Puts the header's own content in a span, so that a column dragged narrow clips its text and not
+ * the grip sitting at its edge. Done here because it is a requirement of resizing, not something
+ * every table that wants to be resizable should have to write.
+ */
+const wrapLabel = (th) => {
+    if (th.querySelector(':scope > .k-column-label')) {
+        return;
+    }
+
+    const label = document.createElement('span');
+    label.className = 'k-column-label';
+
+    while (th.firstChild) {
+        label.appendChild(th.firstChild);
+    }
+
+    th.appendChild(label);
+};
+
 export function enableColumnResize(wrap, tableKey) {
     const table = wrap?.querySelector('table');
     if (!table) {
         return;
     }
 
-    disableColumnResize(wrap);
-
     const headers = [...table.querySelectorAll('thead th')];
     if (headers.length === 0) {
         return;
     }
+
+    // Nothing to do while the table has the same columns it had: measuring again would undo a
+    // width the reader has just dragged. A column hidden or moved changes this and re-measures.
+    const signature = `${tableKey ?? ''}|${signatureOf(headers)}`;
+
+    if (wrap._kColumnSignature === signature && wrap._kColumnResize) {
+        return;
+    }
+
+    disableColumnResize(wrap);
+    wrap._kColumnSignature = signature;
+
+    headers.forEach(wrapLabel);
 
     const saved = read(tableKey);
 
@@ -229,5 +263,6 @@ export function disableColumnResize(wrap) {
 
     if (wrap) {
         wrap._kColumnResize = undefined;
+        wrap._kColumnSignature = undefined;
     }
 }

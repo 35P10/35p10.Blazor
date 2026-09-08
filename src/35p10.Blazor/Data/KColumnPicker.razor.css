@@ -1,0 +1,38 @@
+.column-picker {
+    display: grid;
+    gap: 0.75rem;
+    min-width: min(24rem, 80vw);
+}
+
+.column-picker-list {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.column-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.3rem 0.45rem;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    background: var(--win98-surface, #f4f4f4);
+}
+
+.column-picker-fixed {
+    font-weight: 700;
+}
+
+.column-picker-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.column-picker-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}

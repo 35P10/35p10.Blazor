@@ -30,25 +30,16 @@
     /// <summary>
     ///     Under which name the widths are remembered in the browser. Without it the resizing still
     ///     works, it is just forgotten when the page is left. Columns are told apart by their
-    ///     <c>data-column</c> attribute, or by their header text when there is none.
+    ///     <c>data-column</c> attribute, or by their header text when there is none — which is also
+    ///     how the table notices that a column was hidden or moved and measures again.
     /// </summary>
     [Parameter] public string? ResizeKey { get; set; }
-
-    /// <summary>
-    ///     Changes when the columns do — a column added or removed — so the widths are measured
-    ///     again instead of being applied to a table that no longer has that shape.
-    /// </summary>
-    [Parameter] public string? ColumnSignature { get; set; }
 
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string TableClass => string.IsNullOrWhiteSpace(Class) ? "table" : $"table {Class}";
 
     private string? WrapStyle => string.IsNullOrWhiteSpace(MaxHeight) ? null : $"max-height: {MaxHeight};";
-
-    private string State => $"{Resizable}|{ResizeKey}|{ColumnSignature}";
-
-    private string? appliedState;
 
     public async ValueTask DisposeAsync()
     {
@@ -75,8 +66,9 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         // Nothing to talk to while the page is static HTML; the table is readable there, only not
-        // resizable.
-        if (!RendererInfo.IsInteractive || appliedState == State)
+        // resizable. Otherwise this runs on every render and the script decides whether anything
+        // actually changed — it can see the columns, which is more than this side knows.
+        if (!RendererInfo.IsInteractive || (!Resizable && !enabled))
         {
             return;
         }
@@ -95,7 +87,6 @@
             }
 
             enabled = Resizable;
-            appliedState = State;
         }
         catch (JSDisconnectedException)
         {

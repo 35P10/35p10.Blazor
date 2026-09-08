@@ -1,0 +1,75 @@
+@namespace k35p10.Blazor
+
+@*
+    Which columns a table shows and in which order. Reading a table along one column usually means
+    putting it next to the first one and getting the rest out of the way, so hiding and reordering
+    belong in the same place.
+
+    The list is shown in table order, top to bottom, so that moving a row here and reading the
+    table are the same mental operation.
+*@
+
+<KDialog IsOpen="IsOpen" Title="@Title" OnClose="OnClose">
+    <div class="column-picker">
+        @if (ChildContent is not null)
+        {
+            <KText Variant="KTextVariant.Muted">@ChildContent</KText>
+        }
+
+        <ul class="column-picker-list">
+            @foreach (var (column, index) in Columns.Select((column, index) => (column, index)))
+            {
+                <li class="column-picker-item" @key="column.Key">
+                    @if (column.CanBeHidden)
+                    {
+                        <KCheckbox Value="column.IsVisible"
+                                   ValueChanged="@(_ => OnToggle.InvokeAsync(column.Key))">
+                            @column.Title
+                        </KCheckbox>
+                    }
+                    else
+                    {
+                        <span class="column-picker-fixed" title="This column cannot be hidden">
+                            @column.Title
+                        </span>
+                    }
+
+                    <div class="column-picker-actions">
+                        <KButton title="Move earlier" IconOnly="true" Disabled="@(index == 0)"
+                                 OnClick="@(() => OnMove.InvokeAsync((column.Key, -1)))">↑</KButton>
+                        <KButton title="Move later" IconOnly="true"
+                                 Disabled="@(index == Columns.Count - 1)"
+                                 OnClick="@(() => OnMove.InvokeAsync((column.Key, 1)))">↓</KButton>
+                    </div>
+                </li>
+            }
+        </ul>
+
+        <div class="column-picker-footer">
+            <KButton OnClick="OnReset">@ResetText</KButton>
+            <KButton Variant="KButtonVariant.Primary" OnClick="OnClose">@DoneText</KButton>
+        </div>
+    </div>
+</KDialog>
+
+@code {
+    [Parameter] public bool IsOpen { get; set; }
+
+    /// <summary>Every column the table could show, in table order. See <see cref="KColumnLayout" />.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<KColumnState> Columns { get; set; } = [];
+
+    [Parameter] public string Title { get; set; } = "Columns";
+    [Parameter] public string ResetText { get; set; } = "Reset columns";
+    [Parameter] public string DoneText { get; set; } = "Done";
+
+    /// <summary>An optional line of explanation, in the words of whoever owns the table.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public EventCallback<string> OnToggle { get; set; }
+
+    /// <summary>The column and how far it moves: one place earlier or one place later.</summary>
+    [Parameter] public EventCallback<(string Key, int Offset)> OnMove { get; set; }
+
+    [Parameter] public EventCallback OnReset { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+}

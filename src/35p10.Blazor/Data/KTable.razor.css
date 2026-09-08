@@ -80,12 +80,20 @@
 }
 
 /* A header has to be able to become narrower than its own text, or dragging a column inwards
-   stops at the width of the word and the drag feels broken. */
+   stops at the width of the word and the drag feels broken. The text is wrapped in a span by the
+   script so that it is the text that gets clipped, leaving the grip where it is. */
 ::deep .table.is-resizable th,
 ::deep .table.is-resizable td {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+::deep .k-column-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 0.5rem;
 }
 
 /* Nothing selects while a column is being dragged, and the cursor stays the gesture wherever the
