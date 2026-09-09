@@ -1,0 +1,133 @@
+@namespace k35p10.Blazor
+
+@*
+    Saved states of a screen — searches, layouts — picked from a list, with a dialog for the rest:
+    saving the current one, seeing what each one restores, and deleting the ones that stopped being
+    useful. Choosing is the common act and stays one click away; managing is rare and does not need
+    to occupy the screen while nobody is managing.
+*@
+
+<div class="preset-picker">
+    <KSelect TValue="string" Value="@(SelectedId ?? string.Empty)" ValueChanged="ApplyAsync"
+             aria-label="@Label">
+        <option value="">@Placeholder</option>
+        @foreach (var preset in Presets)
+        {
+            <option value="@preset.Id">@preset.Name</option>
+        }
+    </KSelect>
+
+    <KButton OnClick="() => isOpen = true" title="@Title">@ManageText</KButton>
+</div>
+
+<KDialog IsOpen="isOpen" Title="@Title" OnClose="() => isOpen = false">
+    <div class="preset-picker-panel">
+        @if (ChildContent is not null)
+        {
+            <KText Variant="KTextVariant.Muted">@ChildContent</KText>
+        }
+
+        <div class="preset-picker-save">
+            <KTextInput Value="@name" ValueChanged="@(value => name = value)"
+                        Placeholder="@SavePlaceholder" aria-label="@SavePlaceholder" />
+            <KButton Variant="KButtonVariant.Primary" Disabled="@(string.IsNullOrWhiteSpace(name))"
+                     OnClick="SaveAsync">@SaveText</KButton>
+        </div>
+
+        @if (Presets.Count == 0)
+        {
+            <KText Variant="KTextVariant.Caption">@EmptyText</KText>
+        }
+        else
+        {
+            <ul class="preset-picker-list">
+                @foreach (var preset in Presets)
+                {
+                    <li class="preset-picker-item" @key="preset.Id">
+                        <div class="preset-picker-item-text">
+                            <KText Variant="KTextVariant.Body" Tag="span">@preset.Name</KText>
+                            @if (!string.IsNullOrWhiteSpace(preset.Description))
+                            {
+                                @* What it restores, in the words of whoever saved it: a name alone
+                                   stops meaning anything after the fifth preset. *@
+                                <KText Variant="KTextVariant.Caption" Tag="span">@preset.Description</KText>
+                            }
+                        </div>
+
+                        <div class="preset-picker-item-actions">
+                            <KButton OnClick="@(() => ApplyAsync(preset.Id))">@ApplyText</KButton>
+                            <KButton Class="subtle" title="@($"Delete \"{preset.Name}\"")"
+                                     OnClick="@(() => DeleteAsync(preset))">@DeleteText</KButton>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</KDialog>
+
+@code {
+    private bool isOpen;
+    private string? name;
+
+    /// <summary>What is saved, in the order it should be read.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<KPresetItem> Presets { get; set; } = [];
+
+    /// <summary>Which one is in use, if any: the list shows it as chosen.</summary>
+    [Parameter] public string? SelectedId { get; set; }
+
+    [Parameter] public string Label { get; set; } = "Saved views";
+    [Parameter] public string Placeholder { get; set; } = "Saved views…";
+    [Parameter] public string Title { get; set; } = "Saved views";
+    [Parameter] public string ManageText { get; set; } = "Manage…";
+    [Parameter] public string SavePlaceholder { get; set; } = "Save the current one as…";
+    [Parameter] public string SaveText { get; set; } = "Save";
+    [Parameter] public string ApplyText { get; set; } = "Use";
+    [Parameter] public string DeleteText { get; set; } = "Delete";
+    [Parameter] public string EmptyText { get; set; } = "Nothing saved yet.";
+
+    /// <summary>An optional line of explanation, in the words of whoever owns the screen.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>The preset to restore. Empty when the reader picked the placeholder.</summary>
+    [Parameter] public EventCallback<string> OnApply { get; set; }
+
+    /// <summary>The name to save what is on screen under.</summary>
+    [Parameter] public EventCallback<string> OnSave { get; set; }
+
+    [Parameter] public EventCallback<string> OnDelete { get; set; }
+
+    private async Task ApplyAsync(string? id)
+    {
+        if (string.IsNullOrEmpty(id))
+        {
+            return;
+        }
+
+        // Choosing one closes the dialog: the answer to "which view" is on the screen behind it.
+        isOpen = false;
+        name = Presets.FirstOrDefault(preset => preset.Id == id)?.Name;
+
+        await OnApply.InvokeAsync(id);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return;
+        }
+
+        await OnSave.InvokeAsync(name.Trim());
+    }
+
+    private async Task DeleteAsync(KPresetItem preset)
+    {
+        await OnDelete.InvokeAsync(preset.Id);
+
+        if (name == preset.Name)
+        {
+            name = null;
+        }
+    }
+}

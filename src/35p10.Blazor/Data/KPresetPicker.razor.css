@@ -1,0 +1,58 @@
+.preset-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.preset-picker > :first-child {
+    min-width: 11rem;
+}
+
+.preset-picker-panel {
+    display: grid;
+    gap: 0.75rem;
+    min-width: min(28rem, 84vw);
+}
+
+.preset-picker-save {
+    display: flex;
+    gap: 0.4rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--ui-border, #c6c6c6);
+}
+
+.preset-picker-save > :first-child {
+    flex: 1;
+}
+
+.preset-picker-list {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 18rem;
+    overflow-y: auto;
+}
+
+.preset-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.35rem 0.45rem;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    background: var(--win98-surface, #f4f4f4);
+}
+
+/* The name and what it restores, one under the other: the description is the part that gets long. */
+.preset-picker-item-text {
+    display: grid;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.preset-picker-item-actions {
+    display: flex;
+    gap: 0.25rem;
+}
