@@ -1,0 +1,47 @@
+.menu-button {
+    position: relative;
+    display: inline-flex;
+}
+
+.menu-button-caret {
+    margin-left: 0.35rem;
+    font-size: 0.7em;
+}
+
+/* The sheet that catches a click outside. Transparent, and under the menu. */
+.menu-button-outside {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+}
+
+.menu-button-menu {
+    position: absolute;
+    top: calc(100% + 0.2rem);
+    right: 0;
+    z-index: 21;
+    min-width: 12rem;
+    display: grid;
+    padding: 0.2rem;
+    border: 1px solid var(--ui-border, #c6c6c6);
+    background: var(--win98-surface, #f4f4f4);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+}
+
+::deep .menu-item {
+    display: block;
+    width: 100%;
+    padding: 0.35rem 0.5rem;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+::deep .menu-item:hover,
+::deep .menu-item:focus-visible {
+    background: var(--win98-highlight-soft, #cfe8ff);
+}

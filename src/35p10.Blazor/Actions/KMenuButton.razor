@@ -1,0 +1,55 @@
+@namespace k35p10.Blazor
+
+@*
+    A button that opens a short list of actions. For the third action on a toolbar: two buttons are
+    two buttons, five are a wall, and most of them are not what anybody came for.
+
+    The menu closes on Escape, on a click anywhere else, and when an action is chosen — a menu left
+    open over the thing it acted on is a menu in the way.
+*@
+
+<div class="menu-button">
+    <KButton Variant="Variant" Class="@Class" title="@Title"
+             OnClick="Toggle" aria-expanded="@isOpen.ToString().ToLowerInvariant()">
+        @Text<span class="menu-button-caret" aria-hidden="true">▾</span>
+    </KButton>
+
+    @if (isOpen)
+    {
+        @* A transparent sheet behind the menu: a click outside closes it without asking the
+           document for listeners this component would then have to remember to remove. *@
+        <div class="menu-button-outside" @onclick="Close"></div>
+
+        <div class="menu-button-menu" role="menu" @onkeydown="OnKeyDown">
+            <CascadingValue Value="this" IsFixed="true">
+                @ChildContent
+            </CascadingValue>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isOpen;
+
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+
+    /// <summary>The actions, normally <see cref="KMenuItem" /> components.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public KButtonVariant Variant { get; set; } = KButtonVariant.Default;
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Title { get; set; }
+
+    private void Toggle() => isOpen = !isOpen;
+
+    /// <summary>Called by the items: choosing one is done, and the menu gets out of the way.</summary>
+    public void Close() => isOpen = false;
+
+    private void OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key == "Escape")
+        {
+            Close();
+        }
+    }
+}
