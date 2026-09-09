@@ -9,7 +9,15 @@ namespace k35p10.Blazor;
 ///     False for a column that identifies the row: hiding it would leave a table nobody can read
 ///     back to anything.
 /// </param>
-public sealed record KColumnDefinition(string Key, string Title, bool CanBeHidden = true);
+/// <param name="VisibleByDefault">
+///     False for a column that exists but is not part of the first look at the table. It is still
+///     listed, one click away, and a stored layout that mentions it wins over this.
+/// </param>
+public sealed record KColumnDefinition(
+    string Key,
+    string Title,
+    bool CanBeHidden = true,
+    bool VisibleByDefault = true);
 
 /// <summary>One column as it currently stands: where it is, and whether it is shown.</summary>
 public sealed record KColumnState(string Key, string Title, bool IsVisible, bool CanBeHidden);
@@ -112,10 +120,20 @@ public sealed class KColumnLayout
             .Select(key => new KColumnState(
                 key,
                 declared[key].Title,
-                !_hidden.Contains(key) || !declared[key].CanBeHidden,
+                IsVisible(declared[key]),
                 declared[key].CanBeHidden))
             .ToList();
     }
+
+    /// <summary>
+    ///     Whether a column is shown: what the layout says about it, and if the layout says nothing
+    ///     — a key it never mentioned — what the declaration asked for.
+    /// </summary>
+    private bool IsVisible(KColumnDefinition definition) =>
+        !definition.CanBeHidden
+        || (_order.Contains(definition.Key, StringComparer.Ordinal)
+            ? !_hidden.Contains(definition.Key)
+            : definition.VisibleByDefault);
 
     /// <summary>The columns actually shown, in order.</summary>
     public IReadOnlyList<KColumnState> Visible(IReadOnlyList<KColumnDefinition> definitions) =>
@@ -129,7 +147,7 @@ public sealed class KColumnLayout
             return this;
         }
 
-        var hidden = new HashSet<string>(_hidden, StringComparer.Ordinal);
+        var hidden = HiddenNow(definitions);
 
         if (!hidden.Remove(key))
         {
@@ -157,11 +175,24 @@ public sealed class KColumnLayout
         order.RemoveAt(from);
         order.Insert(to, key);
 
-        return new KColumnLayout(order, _hidden);
+        // The hidden set is taken from what is on screen, not from this layout's own: writing the
+        // full order down turns "hidden because the declaration says so" into "mentioned and not
+        // hidden", and moving one column would bring every hidden one back.
+        return new KColumnLayout(order, HiddenNow(definitions));
     }
 
     /// <summary>Back to the declared order, with everything shown.</summary>
     public KColumnLayout Reset() => new();
+
+    /// <summary>
+    ///     Which columns are invisible as things stand, whether that was asked for or declared.
+    ///     Writing the order down makes every column explicit, so this has to be explicit too.
+    /// </summary>
+    private HashSet<string> HiddenNow(IReadOnlyList<KColumnDefinition> definitions) =>
+        Resolve(definitions)
+            .Where(column => !column.IsVisible)
+            .Select(column => column.Key)
+            .ToHashSet(StringComparer.Ordinal);
 
     private List<string> Keys(IReadOnlyList<KColumnDefinition> definitions) =>
         Resolve(definitions).Select(column => column.Key).ToList();
