@@ -198,7 +198,23 @@ export function enableColumnResize(wrap, tableKey) {
                 schedule();
             };
 
-            const up = upEvent => { move(upEvent); finish(true); };
+            const up = upEvent => {
+                move(upEvent);
+                finish(true);
+
+                // A header may be a button — sorting by clicking it is common — and letting go of a
+                // drag must not also press it. One click is swallowed, and only if the pointer
+                // actually moved.
+                if (Math.abs(upEvent.clientX - startX) > 2) {
+                    const swallow = clickEvent => {
+                        clickEvent.stopPropagation();
+                        clickEvent.preventDefault();
+                    };
+
+                    th.addEventListener('click', swallow, { capture: true, once: true });
+                    setTimeout(() => th.removeEventListener('click', swallow, { capture: true }), 300);
+                }
+            };
             const cancel = () => finish(false);
             const key = keyEvent => {
                 if (keyEvent.key === 'Escape') {

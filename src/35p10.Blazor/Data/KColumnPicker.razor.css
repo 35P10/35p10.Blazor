@@ -22,20 +22,50 @@
 .column-picker-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.6rem;
     padding: 0.3rem 0.45rem;
     border: 1px solid var(--ui-border, #c6c6c6);
     background: var(--win98-surface, #f4f4f4);
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.column-picker-item:focus-visible {
+    outline: 2px solid var(--win98-blue-strong, #0a246a);
+    outline-offset: 1px;
+}
+
+/* The handle says the row can be moved; the whole row is the grab area. */
+.column-picker-grip {
+    color: var(--win98-muted, #6b7280);
+    letter-spacing: -0.1em;
+}
+
+/* The row being dragged rides above the others and keeps its place in the list, so nothing jumps
+   until the order actually changes. */
+.column-picker-item.is-dragging {
+    position: relative;
+    z-index: 2;
+    cursor: grabbing;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 25%);
+}
+
+/* Where it would land. A line, not a gap: the list does not reflow while dragging. */
+.column-picker-item.is-drop-before {
+    box-shadow: inset 0 2px 0 var(--win98-blue-strong, #0a246a);
+}
+
+.column-picker-item.is-drop-after {
+    box-shadow: inset 0 -2px 0 var(--win98-blue-strong, #0a246a);
+}
+
+.column-picker-list.is-reordering .column-picker-item {
+    cursor: grabbing;
 }
 
 .column-picker-fixed {
     font-weight: 700;
-}
-
-.column-picker-actions {
-    display: flex;
-    gap: 0.25rem;
 }
 
 .column-picker-footer {

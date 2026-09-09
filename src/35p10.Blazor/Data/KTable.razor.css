@@ -101,3 +101,9 @@
 ::deep .table.is-resizing {
     user-select: none;
 }
+
+/* While a column is being dragged, a header that is also a button must not look pressable. The
+   grip keeps its own events: it is the thing being dragged. */
+::deep .table.is-resizing th *:not(.k-column-grip) {
+    pointer-events: none;
+}

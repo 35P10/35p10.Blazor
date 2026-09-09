@@ -1,4 +1,6 @@
 @namespace k35p10.Blazor
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 
 @*
     Which columns a table shows and in which order. Reading a table along one column usually means
@@ -6,7 +8,7 @@
     belong in the same place.
 
     The list is shown in table order, top to bottom, so that moving a row here and reading the
-    table are the same mental operation.
+    table are the same mental operation: a row is dragged where the column should go.
 *@
 
 <KDialog IsOpen="IsOpen" Title="@Title" OnClose="OnClose">
@@ -23,10 +25,16 @@
             <div class="column-picker-header">@Header</div>
         }
 
-        <ul class="column-picker-list">
-            @foreach (var (column, index) in Columns.Select((column, index) => (column, index)))
+        <ul class="column-picker-list" @ref="list">
+            @foreach (var column in Columns)
             {
-                <li class="column-picker-item" @key="column.Key">
+                @* Focusable and answering the arrow keys as well: a drag is a mouse, and the order
+                   of the columns should not need one. *@
+                <li class="column-picker-item" data-reorder-key="@column.Key" tabindex="0"
+                    @onkeydown="@(args => OnKeyAsync(column.Key, args))" @key="column.Key">
+                    <span class="column-picker-grip" aria-hidden="true"
+                          title="Drag to reorder · arrow keys also work">⠿</span>
+
                     @if (column.CanBeHidden)
                     {
                         <KCheckbox Value="column.IsVisible"
@@ -40,14 +48,6 @@
                             @column.Title
                         </span>
                     }
-
-                    <div class="column-picker-actions">
-                        <KButton title="Move earlier" IconOnly="true" Disabled="@(index == 0)"
-                                 OnClick="@(() => OnMove.InvokeAsync((column.Key, -1)))">↑</KButton>
-                        <KButton title="Move later" IconOnly="true"
-                                 Disabled="@(index == Columns.Count - 1)"
-                                 OnClick="@(() => OnMove.InvokeAsync((column.Key, 1)))">↓</KButton>
-                    </div>
                 </li>
             }
         </ul>
@@ -60,6 +60,13 @@
 </KDialog>
 
 @code {
+    private const string ModulePath = "./_content/35p10.Blazor/data/list-reorder.js";
+
+    private ElementReference list;
+    private IJSObjectReference? module;
+    private DotNetObjectReference<KColumnPicker>? self;
+    private bool attached;
+
     [Parameter] public bool IsOpen { get; set; }
 
     /// <summary>Every column the table could show, in table order. See <see cref="KColumnLayout" />.</summary>
@@ -82,4 +89,70 @@
 
     [Parameter] public EventCallback OnReset { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
+
+    /// <summary>
+    ///     Called by the script when a row is dropped: the column and how far it moved. The list is
+    ///     not rearranged in the browser — the owner of the order moves it and this re-renders.
+    /// </summary>
+    [JSInvokable]
+    public Task MovedTo(string key, int offset) => OnMove.InvokeAsync((key, offset));
+
+    private Task OnKeyAsync(string key, KeyboardEventArgs args) => args.Key switch
+    {
+        "ArrowUp" => OnMove.InvokeAsync((key, -1)),
+        "ArrowDown" => OnMove.InvokeAsync((key, 1)),
+        _ => Task.CompletedTask,
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (module is not null)
+            {
+                await module.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // The circuit is gone and the listeners went with the page.
+        }
+        catch (InvalidOperationException)
+        {
+            // Prerendering: there was never anything attached.
+        }
+
+        self?.Dispose();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // The list only exists while the dialog is open, so the listener follows it.
+        if (!RendererInfo.IsInteractive || attached == IsOpen)
+        {
+            return;
+        }
+
+        try
+        {
+            if (!IsOpen)
+            {
+                // The dialog renders nothing when closed, so the list and its listener went with
+                // it. Reaching for that element to detach would be reaching for something gone.
+                attached = false;
+
+                return;
+            }
+
+            module ??= await JSRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath);
+            self ??= DotNetObjectReference.Create(this);
+
+            await module.InvokeVoidAsync("enableReorder", list, self);
+            attached = true;
+        }
+        catch (JSDisconnectedException)
+        {
+            // The circuit closed while the dialog was being set up.
+        }
+    }
 }
