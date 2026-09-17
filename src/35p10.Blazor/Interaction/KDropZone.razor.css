@@ -1,0 +1,15 @@
+.k-drop-zone {
+    transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.k-drop-zone--active {
+    border-color: var(--ui-accent, #1ba1e2) !important;
+    background: rgba(27, 161, 226, 0.12) !important;
+    box-shadow: 0 0 0 3px rgba(27, 161, 226, 0.2);
+    transform: translateY(-1px);
+}
+
+.k-drop-zone--dropping {
+    pointer-events: none;
+    opacity: 0.7;
+}

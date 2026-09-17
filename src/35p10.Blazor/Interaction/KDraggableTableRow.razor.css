@@ -1,0 +1,7 @@
+.k-draggable-table-row[draggable="true"] {
+    cursor: grab;
+}
+
+.k-draggable-table-row--active {
+    opacity: 0.55;
+}

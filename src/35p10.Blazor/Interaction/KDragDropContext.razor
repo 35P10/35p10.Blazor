@@ -1,0 +1,80 @@
+@namespace k35p10.Blazor
+@typeparam TValue
+
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    private TValue? _value;
+    private bool _hasValue;
+    private object? _activeZone;
+
+    [Parameter, EditorRequired] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<TValue> DragStarted { get; set; }
+    [Parameter] public EventCallback DragEnded { get; set; }
+
+    internal event Action? Changed;
+    internal bool HasValue => _hasValue;
+    internal bool IsDragging(TValue value) =>
+        _hasValue && EqualityComparer<TValue>.Default.Equals(_value!, value);
+    internal bool IsActiveZone(object zone) => _hasValue && ReferenceEquals(_activeZone, zone);
+
+    internal async Task BeginAsync(TValue value)
+    {
+        _value = value;
+        _hasValue = true;
+        _activeZone = null;
+        NotifyChanged();
+        await DragStarted.InvokeAsync(value);
+    }
+
+    internal void Enter(object zone)
+    {
+        if (!_hasValue || ReferenceEquals(_activeZone, zone))
+        {
+            return;
+        }
+
+        _activeZone = zone;
+        NotifyChanged();
+    }
+
+    internal async Task DropAsync(object zone, EventCallback<TValue> callback)
+    {
+        if (!_hasValue || !ReferenceEquals(_activeZone, zone))
+        {
+            return;
+        }
+
+        var value = _value!;
+        try
+        {
+            await callback.InvokeAsync(value);
+        }
+        finally
+        {
+            await EndAsync();
+        }
+    }
+
+    internal async Task EndAsync()
+    {
+        if (!_hasValue)
+        {
+            return;
+        }
+
+        _value = default;
+        _hasValue = false;
+        _activeZone = null;
+        NotifyChanged();
+        await DragEnded.InvokeAsync();
+    }
+
+    private void NotifyChanged()
+    {
+        Changed?.Invoke();
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,54 @@
+@namespace k35p10.Blazor
+@typeparam TValue
+@implements IDisposable
+
+<tr class="@CssClass"
+    draggable="@(!Disabled)"
+    title="@Title"
+    @ondragstart="BeginAsync"
+    @ondragend="EndAsync"
+    @attributes="AdditionalAttributes">
+    @ChildContent
+</tr>
+
+@code {
+    private Action? _changed;
+
+    [CascadingParameter] private KDragDropContext<TValue>? Context { get; set; }
+
+    [Parameter, EditorRequired] public TValue Value { get; set; } = default!;
+    [Parameter, EditorRequired] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => string.Join(' ', new[]
+    {
+        "k-draggable-table-row",
+        Context?.IsDragging(Value) == true ? "k-draggable-table-row--active" : null,
+        Class,
+    }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    protected override void OnInitialized()
+    {
+        if (Context is null)
+        {
+            throw new InvalidOperationException($"{nameof(KDraggableTableRow<TValue>)} must be inside a {nameof(KDragDropContext<TValue>)}.");
+        }
+
+        _changed = () => _ = InvokeAsync(StateHasChanged);
+        Context.Changed += _changed;
+    }
+
+    public void Dispose()
+    {
+        if (Context is not null && _changed is not null)
+        {
+            Context.Changed -= _changed;
+        }
+    }
+
+    private Task BeginAsync() => Disabled ? Task.CompletedTask : Context!.BeginAsync(Value);
+    private Task EndAsync() => Context!.EndAsync();
+}

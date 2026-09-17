@@ -7,8 +7,8 @@
     <PropertyGroup>
         <PackageId>35p10.Blazor</PackageId>
         <Version>1.0.0</Version>
-        <Description>Reusable Blazor components for blog-style article pages: header, sections, table of contents with scroll spy, and code blocks.</Description>
-        <PackageTags>blazor;blog;razor-components</PackageTags>
+        <Description>Reusable Blazor components for application layouts, data presentation, interaction, and blog-style article pages.</Description>
+        <PackageTags>blazor;components;drag-drop;data;blog</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 

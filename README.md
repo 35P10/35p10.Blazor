@@ -89,3 +89,22 @@ The `demo/` project shows every component in use:
 ```bash
 dotnet run --project demo/35p10.Blazor.Demo
 ```
+
+## Typed drag and drop
+
+`KDragDropContext<TValue>` coordinates reusable draggable values and drop zones without knowing the
+application's domain. Use `KDraggable<TValue>` for cards and list items,
+`KDraggableTableRow<TValue>` inside tables, and `KDropZone<TValue>` for each destination:
+
+```razor
+<KDragDropContext TValue="Guid">
+    <KDraggable TValue="Guid" Value="item.Id">@item.Name</KDraggable>
+    <KDropZone TValue="Guid" OnDrop="id => AddAsync(folder.Id, id)">
+        @folder.Name
+    </KDropZone>
+</KDragDropContext>
+```
+
+The context owns the active value and destination, supplies visual drag states, prevents duplicate
+drop handling, and exposes optional `DragStarted` and `DragEnded` callbacks. The application remains
+responsible only for the operation performed by `OnDrop`.

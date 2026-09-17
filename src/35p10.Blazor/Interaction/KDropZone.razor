@@ -1,0 +1,80 @@
+@namespace k35p10.Blazor
+@typeparam TValue
+@implements IDisposable
+
+<div class="@CssClass"
+     aria-busy="@_isDropping"
+     @ondragenter="Enter"
+     @ondragover:preventDefault
+     @ondrop="DropAsync"
+     @attributes="AdditionalAttributes">
+    @ChildContent
+</div>
+
+@code {
+    private Action? _changed;
+    private bool _isDropping;
+
+    [CascadingParameter] private KDragDropContext<TValue>? Context { get; set; }
+
+    [Parameter, EditorRequired] public RenderFragment? ChildContent { get; set; }
+    [Parameter, EditorRequired] public EventCallback<TValue> OnDrop { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private bool IsActive => !Disabled && Context?.IsActiveZone(this) == true;
+
+    private string CssClass => string.Join(' ', new[]
+    {
+        "k-drop-zone",
+        IsActive ? "k-drop-zone--active" : null,
+        _isDropping ? "k-drop-zone--dropping" : null,
+        Class,
+    }.Where(value => !string.IsNullOrWhiteSpace(value)));
+
+    protected override void OnInitialized()
+    {
+        if (Context is null)
+        {
+            throw new InvalidOperationException($"{nameof(KDropZone<TValue>)} must be inside a {nameof(KDragDropContext<TValue>)}.");
+        }
+
+        _changed = () => _ = InvokeAsync(StateHasChanged);
+        Context.Changed += _changed;
+    }
+
+    public void Dispose()
+    {
+        if (Context is not null && _changed is not null)
+        {
+            Context.Changed -= _changed;
+        }
+    }
+
+    private void Enter()
+    {
+        if (!Disabled && !_isDropping)
+        {
+            Context!.Enter(this);
+        }
+    }
+
+    private async Task DropAsync()
+    {
+        if (Disabled || _isDropping || !IsActive)
+        {
+            return;
+        }
+
+        _isDropping = true;
+        try
+        {
+            await Context!.DropAsync(this, OnDrop);
+        }
+        finally
+        {
+            _isDropping = false;
+        }
+    }
+}

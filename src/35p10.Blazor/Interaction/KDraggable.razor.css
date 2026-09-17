@@ -1,0 +1,15 @@
+.k-draggable {
+    min-width: 0;
+}
+
+.k-draggable[draggable="true"] {
+    cursor: grab;
+}
+
+.k-draggable > * {
+    height: 100%;
+}
+
+.k-draggable--active {
+    opacity: 0.55;
+}
