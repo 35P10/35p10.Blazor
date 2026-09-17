@@ -32,7 +32,9 @@
                    of the columns should not need one. *@
                 <li class="column-picker-item" data-reorder-key="@column.Key" tabindex="0"
                     @onkeydown="@(args => OnKeyAsync(column.Key, args))" @key="column.Key">
-                    <span class="column-picker-grip" aria-hidden="true"
+                    @* `data-reorder-grip` is what the script looks for when the pointer is a
+                       finger: see the note in the stylesheet. *@
+                    <span class="column-picker-grip" data-reorder-grip aria-hidden="true"
                           title="Drag to reorder · arrow keys also work">⠿</span>
 
                     @if (column.CanBeHidden)
@@ -66,6 +68,7 @@
     private IJSObjectReference? module;
     private DotNetObjectReference<KColumnPicker>? self;
     private bool attached;
+    private string? reveal;
 
     [Parameter] public bool IsOpen { get; set; }
 
@@ -97,12 +100,26 @@
     [JSInvokable]
     public Task MovedTo(string key, int offset) => OnMove.InvokeAsync((key, offset));
 
-    private Task OnKeyAsync(string key, KeyboardEventArgs args) => args.Key switch
+    private Task OnKeyAsync(string key, KeyboardEventArgs args)
     {
-        "ArrowUp" => OnMove.InvokeAsync((key, -1)),
-        "ArrowDown" => OnMove.InvokeAsync((key, 1)),
-        _ => Task.CompletedTask,
-    };
+        var offset = args.Key switch
+        {
+            "ArrowUp" => -1,
+            "ArrowDown" => 1,
+            _ => 0,
+        };
+
+        if (offset == 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        // The list scrolls once there are more columns than fit, and a row moved with the keyboard
+        // can land outside the part of it being shown. It is followed after the re-render.
+        reveal = key;
+
+        return OnMove.InvokeAsync((key, offset));
+    }
 
     public async ValueTask DisposeAsync()
     {
@@ -127,8 +144,27 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!RendererInfo.IsInteractive)
+        {
+            return;
+        }
+
+        if (attached && reveal is { } key)
+        {
+            reveal = null;
+
+            try
+            {
+                await module!.InvokeVoidAsync("revealKey", list, key);
+            }
+            catch (JSDisconnectedException)
+            {
+                // The circuit closed between the move and the scroll; nothing to show anyone.
+            }
+        }
+
         // The list only exists while the dialog is open, so the listener follows it.
-        if (!RendererInfo.IsInteractive || attached == IsOpen)
+        if (attached == IsOpen)
         {
             return;
         }

@@ -11,6 +11,36 @@
 /** Below this the gesture was a click, not a drag: a row can also be a checkbox. */
 const DragThreshold = 4;
 
+/** How near the edge of a scrolling list the pointer has to be for the list to follow it. */
+const EdgeZone = 40;
+
+/** How fast it follows, in pixels a frame, at the very edge; it eases in across the zone. */
+const EdgeSpeed = 14;
+
+/**
+ * The box the row is being dragged inside of. A long list is taller than the dialog holding it, so
+ * this is usually the list itself — but the list is not always the thing that scrolls, and the
+ * drag has to answer to whichever one is.
+ */
+function scrollerOf(node) {
+    for (let current = node; current && current !== document.body; current = current.parentElement) {
+        const overflow = getComputedStyle(current).overflowY;
+
+        if ((overflow === 'auto' || overflow === 'scroll')
+            && current.scrollHeight > current.clientHeight) {
+            return current;
+        }
+    }
+
+    return null;
+}
+
+/** Bring a row into view without moving anything already in it: for moves made with the keyboard. */
+export function revealKey(host, key) {
+    host?.querySelector(`[data-reorder-key="${CSS.escape(key)}"]`)
+        ?.scrollIntoView({ block: 'nearest' });
+}
+
 export function enableReorder(host, handler) {
     if (!host) {
         return;
@@ -27,17 +57,29 @@ export function enableReorder(host, handler) {
             return;
         }
 
+        // Dragging a row and scrolling the list are the same gesture to a finger, and the list has
+        // to stay scrollable. So a finger picks a row up by its handle, and a mouse — which scrolls
+        // with its wheel — can take the row anywhere on it.
+        if (event.pointerType !== 'mouse' && !event.target.closest('[data-reorder-grip]')) {
+            return;
+        }
+
         const startY = event.clientY;
         const order = rows();
         const from = order.indexOf(row);
+        const scroller = scrollerOf(host);
+        const startScroll = scroller ? scroller.scrollTop : 0;
+        let pointerY = startY;
         let to = from;
         let dragging = false;
+        let frame = 0;
 
         const cleanUp = () => {
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
             window.removeEventListener('pointercancel', onCancel);
             window.removeEventListener('keydown', onKey);
+            cancelAnimationFrame(frame);
 
             row.style.transform = '';
             row.classList.remove('is-dragging');
@@ -45,39 +87,26 @@ export function enableReorder(host, handler) {
             host.classList.remove('is-reordering');
         };
 
-        const onMove = moveEvent => {
-            const delta = moveEvent.clientY - startY;
+        // Where the row is shown and where it would land, from the last known pointer position.
+        // Called on every move and on every frame the list scrolls itself, because a list moving
+        // under a pointer that is holding still changes both answers.
+        const place = () => {
+            // The row is offset from where the browser laid it out, and the browser moves it along
+            // with everything else when the list scrolls: what the scrolling added has to be added
+            // back, or the row slides out from under the pointer.
+            const scrolled = scroller ? scroller.scrollTop - startScroll : 0;
 
-            if (!dragging) {
-                if (Math.abs(delta) < DragThreshold) {
-                    return;
-                }
-
-                dragging = true;
-                row.classList.add('is-dragging');
-                host.classList.add('is-reordering');
-
-                try {
-                    row.setPointerCapture(moveEvent.pointerId);
-                } catch {
-                    // Synthetic pointers: the window listeners carry the drag anyway.
-                }
-            }
-
-            // The row follows the pointer; the others stay put and one of them shows the edge the
-            // row would land on. Cheaper than animating a reflow, and easier to read.
-            row.style.transform = `translateY(${delta}px)`;
+            row.style.transform = `translateY(${pointerY - startY + scrolled}px)`;
 
             // Where it would land, counted among the rows that are not being dragged: that is the
             // position the application's own move works in.
             const others = order.filter(other => other !== row);
-            const y = moveEvent.clientY;
             let insertion = others.length;
 
             for (let index = 0; index < others.length; index++) {
                 const box = others[index].getBoundingClientRect();
 
-                if (y < box.top + box.height / 2) {
+                if (pointerY < box.top + box.height / 2) {
                     insertion = index;
                     break;
                 }
@@ -92,6 +121,63 @@ export function enableReorder(host, handler) {
             } else if (others.length > 0) {
                 others[others.length - 1].classList.add('is-drop-after');
             }
+        };
+
+        // Holding a row against the top or bottom edge scrolls the list past it. Without this a row
+        // could only ever be moved as far as the part of the list that happens to be on screen.
+        const follow = () => {
+            frame = requestAnimationFrame(follow);
+
+            if (!scroller) {
+                return;
+            }
+
+            const box = scroller.getBoundingClientRect();
+            const above = pointerY - box.top;
+            const below = box.bottom - pointerY;
+            let by = 0;
+
+            if (above < EdgeZone) {
+                by = -EdgeSpeed * Math.min(1, (EdgeZone - above) / EdgeZone);
+            } else if (below < EdgeZone) {
+                by = EdgeSpeed * Math.min(1, (EdgeZone - below) / EdgeZone);
+            }
+
+            if (by === 0) {
+                return;
+            }
+
+            const before = scroller.scrollTop;
+            scroller.scrollTop += by;
+
+            // At either end there is nothing left to scroll, and re-placing the row would be work
+            // for an unchanged answer.
+            if (scroller.scrollTop !== before) {
+                place();
+            }
+        };
+
+        const onMove = moveEvent => {
+            pointerY = moveEvent.clientY;
+
+            if (!dragging) {
+                if (Math.abs(pointerY - startY) < DragThreshold) {
+                    return;
+                }
+
+                dragging = true;
+                row.classList.add('is-dragging');
+                host.classList.add('is-reordering');
+                frame = requestAnimationFrame(follow);
+
+                try {
+                    row.setPointerCapture(moveEvent.pointerId);
+                } catch {
+                    // Synthetic pointers: the window listeners carry the drag anyway.
+                }
+            }
+
+            place();
         };
 
         const onUp = () => {

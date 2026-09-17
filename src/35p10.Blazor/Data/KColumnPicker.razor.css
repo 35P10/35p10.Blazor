@@ -1,11 +1,18 @@
 .column-picker {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 0.75rem;
     min-width: min(24rem, 80vw);
+    /* Fills the dialog body rather than pushing past it. A table worth picking columns for has
+       more of them than fit on a screen, and the list below is what gives way: the saved sets
+       above it and the buttons under it are the way out of here and have to stay in sight. */
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .column-picker-header {
     display: grid;
+    flex: none;
     gap: 0.4rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--ui-border, #c6c6c6);
@@ -13,9 +20,18 @@
 
 .column-picker-list {
     display: grid;
+    /* Takes what the header and the footer leave, and scrolls the rest — but not below a few rows
+       at a time: on a screen too short even for that, the dialog goes back to scrolling as a whole
+       rather than showing a list one row tall. */
+    flex: 1 1 auto;
+    min-height: 6rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     gap: 0.25rem;
     margin: 0;
-    padding: 0;
+    /* Not `0`: a scrolling box cuts whatever leans out of it, and the focus ring of the first and
+       last rows leans out by exactly this much. */
+    padding: 3px;
     list-style: none;
 }
 
@@ -28,7 +44,6 @@
     background: var(--win98-surface, #f4f4f4);
     cursor: grab;
     user-select: none;
-    touch-action: none;
 }
 
 .column-picker-item:focus-visible {
@@ -36,10 +51,14 @@
     outline-offset: 1px;
 }
 
-/* The handle says the row can be moved; the whole row is the grab area. */
+/* The handle says the row can be moved. A mouse can take the row anywhere on it; a finger cannot,
+   because dragging the row is also how the list is scrolled — so the handle is where a finger
+   picks a row up, and `touch-action` is turned off here alone. */
 .column-picker-grip {
+    padding: 0.1rem 0.15rem;
     color: var(--win98-muted, #6b7280);
     letter-spacing: -0.1em;
+    touch-action: none;
 }
 
 /* The row being dragged rides above the others and keeps its place in the list, so nothing jumps
@@ -70,6 +89,7 @@
 
 .column-picker-footer {
     display: flex;
+    flex: none;
     justify-content: space-between;
     gap: 0.5rem;
 }
