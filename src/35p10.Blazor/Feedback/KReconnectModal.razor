@@ -1,0 +1,46 @@
+@namespace k35p10.Blazor
+
+<script type="module" src="_content/35p10.Blazor/feedback/reconnect-modal.js"></script>
+
+<dialog id="components-reconnect-modal" data-nosnippet>
+    <div class="components-reconnect-container">
+        <div class="components-rejoining-animation" aria-hidden="true">
+            <div></div>
+            <div></div>
+        </div>
+        <p class="components-reconnect-first-attempt-visible">
+            @RejoiningText
+        </p>
+        <p class="components-reconnect-repeated-attempt-visible">
+            @RetryingText <span id="components-seconds-to-next-attempt"></span> @RetryingSecondsText
+        </p>
+        <p class="components-reconnect-failed-visible">
+            @FailedText<br />@FailedActionText
+        </p>
+        <button id="components-reconnect-button" class="components-reconnect-failed-visible">
+            @RetryText
+        </button>
+        <p class="components-pause-visible">
+            @PausedText
+        </p>
+        <button id="components-resume-button" class="components-pause-visible">
+            @ResumeText
+        </button>
+        <p class="components-resume-failed-visible">
+            @ResumeFailedText<br />@ResumeFailedActionText
+        </p>
+    </div>
+</dialog>
+
+@code {
+    [Parameter] public string RejoiningText { get; set; } = "Rejoining the server...";
+    [Parameter] public string RetryingText { get; set; } = "Rejoin failed... trying again in";
+    [Parameter] public string RetryingSecondsText { get; set; } = "seconds.";
+    [Parameter] public string FailedText { get; set; } = "Failed to rejoin.";
+    [Parameter] public string FailedActionText { get; set; } = "Please retry or reload the page.";
+    [Parameter] public string RetryText { get; set; } = "Retry";
+    [Parameter] public string PausedText { get; set; } = "The session has been paused by the server.";
+    [Parameter] public string ResumeText { get; set; } = "Resume";
+    [Parameter] public string ResumeFailedText { get; set; } = "Failed to resume the session.";
+    [Parameter] public string ResumeFailedActionText { get; set; } = "Please reload the page.";
+}

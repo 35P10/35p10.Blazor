@@ -48,6 +48,13 @@
     </Example>
 </DemoSection>
 
+<DemoSection Title="KReconnectModal" Code="@ReconnectModalSnippet">
+    <Description>
+        A global reconnect experience for Blazor Interactive Server apps. Place one instance next to
+        <KCode>Routes</KCode>; Blazor controls its states automatically. Text parameters can be localized.
+    </Description>
+</DemoSection>
+
 @code {
     private bool isDialogOpen;
     private readonly List<KToastItem> toasts = [];
@@ -102,5 +109,12 @@
             <KText Variant="KTextVariant.Body">Image not found.</KText>
             <KButton Href="trials">Back</KButton>
         </KEmptyState>
+        """;
+
+    private const string ReconnectModalSnippet =
+        """
+        <Routes @rendermode="InteractiveServer" />
+        <KReconnectModal />
+        <script src="@Assets["_framework/blazor.web.js"]"></script>
         """;
 }

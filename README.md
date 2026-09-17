@@ -108,3 +108,17 @@ application's domain. Use `KDraggable<TValue>` for cards and list items,
 The context owns the active value and destination, supplies visual drag states, prevents duplicate
 drop handling, and exposes optional `DragStarted` and `DragEnded` callbacks. The application remains
 responsible only for the operation performed by `OnDrop`.
+
+## Interactive Server reconnection
+
+`KReconnectModal` provides the global reconnect, retry, pause, and resume experience for Blazor
+Interactive Server apps. Render exactly one instance in the app document next to `Routes`:
+
+```razor
+<Routes @rendermode="InteractiveServer" />
+<KReconnectModal />
+<script src="@Assets["_framework/blazor.web.js"]"></script>
+```
+
+Blazor owns the reconnect state and the component supplies the UI and browser-side behavior. Its
+text parameters can be overridden for localization.
