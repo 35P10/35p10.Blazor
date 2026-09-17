@@ -11,6 +11,7 @@ public enum KIconName
     ChevronLeft,
     ChevronRight,
     Save,
+    Pin,
     Aoi,
     Edit,
     Close,
